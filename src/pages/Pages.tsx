@@ -1,16 +1,5 @@
 import { Card, Label, PageHeader, Placeholder } from '../components/ui'
 
-export function Office() {
-  return (
-    <>
-      <PageHeader title="Escritório" subtitle="Escritório virtual isométrico." />
-      <Placeholder phase="Fase 3">
-        Cena 3D (Three.js / React Three Fiber) com fallback 2D será implementada na Fase 3.
-      </Placeholder>
-    </>
-  )
-}
-
 const agents = [
   ['SCOUT', 'Prospecção'],
   ['ATLAS', 'Desenvolvimento'],

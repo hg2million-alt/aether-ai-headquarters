@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { Wordmark } from './components/Wordmark'
 import { currentRoute, type RouteId } from './lib/nav'
-import { Agents, Office, Settings } from './pages/Pages'
+import { Agents, Settings } from './pages/Pages'
 import { Dashboard } from './pages/Dashboard'
+import { Office } from './pages/Office'
 import { History } from './pages/History'
 
 const views: Record<RouteId, () => React.JSX.Element> = {
