@@ -15,7 +15,7 @@ export function BottomNav({ active }: { active: RouteId }) {
               <a
                 href={`#/${r.id}`}
                 aria-current={on ? 'page' : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl text-[10px] uppercase tracking-label transition-colors md:min-h-11 md:flex-row md:justify-start md:gap-3 md:px-3 md:text-xs ${
+                className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl text-[10px] uppercase tracking-[0.08em] transition-colors md:min-h-11 md:flex-row md:justify-start md:gap-3 md:px-3 md:text-xs ${
                   on ? 'text-white' : 'text-fg-3 hover:text-fg-2'
                 }`}
               >

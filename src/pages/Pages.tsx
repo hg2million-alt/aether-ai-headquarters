@@ -1,19 +1,4 @@
-import { Card, Label, PageHeader, Placeholder, Stat } from '../components/ui'
-
-export function Dashboard() {
-  return (
-    <>
-      <PageHeader title="Painel" subtitle="Metas e resultados são exibidos separadamente." />
-      <div className="grid grid-cols-2 gap-3 px-5 pb-4">
-        <Stat label="Meta diária" value="2" hint="demos / dia" />
-        <Stat label="Meta semanal" value="14" hint="demos / semana" />
-      </div>
-      <Placeholder phase="Fase 2">
-        Métricas reais (leads, demos, propostas, vendas) serão adicionadas na Fase 2. Nenhum número fictício é exibido como resultado.
-      </Placeholder>
-    </>
-  )
-}
+import { Card, Label, PageHeader, Placeholder } from '../components/ui'
 
 export function Office() {
   return (
@@ -51,15 +36,6 @@ export function Agents() {
           </li>
         ))}
       </ul>
-    </>
-  )
-}
-
-export function History() {
-  return (
-    <>
-      <PageHeader title="Histórico" subtitle="Eventos operacionais verificados." />
-      <Placeholder phase="Fase 2">Sem eventos registrados. O histórico será alimentado por eventos autenticados.</Placeholder>
     </>
   )
 }

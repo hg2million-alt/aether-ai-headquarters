@@ -5,7 +5,7 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
 }
 
 export function Label({ children }: { children: ReactNode }) {
-  return <p className="text-[11px] font-medium uppercase tracking-label text-fg-2">{children}</p>
+  return <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-fg-2 [overflow-wrap:anywhere]">{children}</p>
 }
 
 export function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
@@ -41,5 +41,37 @@ export function Placeholder({ phase, children }: { phase: string; children: Reac
       <Badge>{phase}</Badge>
       <p className="mt-3 text-sm leading-relaxed text-fg-2">{children}</p>
     </Card>
+  )
+}
+
+export function SimBanner() {
+  return (
+    <div role="note" className="mx-5 mb-4 rounded-xl border border-dashed border-line px-4 py-2.5 text-[11px] uppercase tracking-label text-fg-2">
+      Dados simulados · não são resultados reais
+    </div>
+  )
+}
+
+export function Progress({ label, value, target }: { label: string; value: number; target: number }) {
+  const pct = target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0
+  return (
+    <div>
+      <div className="flex items-baseline justify-between">
+        <Label>{label}</Label>
+        <p className="text-sm tabular-nums text-fg-2">
+          <span className="text-2xl font-extralight text-white">{value}</span> / {target}
+        </p>
+      </div>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={target}
+        aria-valuenow={value}
+        className="mt-3 h-1 overflow-hidden rounded-full bg-elevated"
+      >
+        <div className="h-full bg-white" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
   )
 }
