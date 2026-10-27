@@ -1,7 +1,7 @@
 export type AgentId = 'scout' | 'atlas' | 'sentinel' | 'nova' | 'mercury'
 export type AgentStatus = 'idle' | 'sleeping' | 'working' | 'completed' | 'failed' | 'unknown'
 /** Estado da conexão com a automação (Worker). */
-export type Connection = 'not_configured' | 'connecting' | 'online' | 'error'
+export type Connection = 'not_configured' | 'connecting' | 'online' | 'unauthorized' | 'error'
 
 export interface Funnel {
   leadsFound: number

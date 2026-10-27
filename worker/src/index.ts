@@ -14,8 +14,10 @@ export interface Env {
 }
 
 const MAX_BODY = 4096
-const json = (data: unknown, status = 200) =>
-  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } })
+/** CORS só para leitura (GET): a autenticação é a chave Bearer, sem cookies; escrita exige assinatura. */
+const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization, content-type', 'access-control-allow-methods': 'GET, OPTIONS' }
+const json = (data: unknown, status = 200, extra: Record<string, string> = {}) =>
+  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...extra } })
 
 async function ingest(req: Request, env: Env): Promise<Response> {
   if (!env.EVENT_SIGNING_SECRET) return json({ error: 'server_misconfigured' }, 500) // falha fechada
@@ -54,7 +56,7 @@ async function ingest(req: Request, env: Env): Promise<Response> {
 
 async function list(req: Request, env: Env): Promise<Response> {
   const token = (req.headers.get('authorization') ?? '').replace(/^Bearer /, '')
-  if (!env.HQ_READ_TOKEN || !timingSafeEqual(token, env.HQ_READ_TOKEN)) return json({ error: 'unauthorized' }, 401)
+  if (!env.HQ_READ_TOKEN || !timingSafeEqual(token, env.HQ_READ_TOKEN)) return json({ error: 'unauthorized' }, 401, CORS)
   const { results } = await env.DB.prepare(
     'SELECT event_id, agent_id, task_id, status, activity, kind, ts FROM events ORDER BY ts DESC, event_id DESC LIMIT ?',
   )
@@ -64,12 +66,13 @@ async function list(req: Request, env: Env): Promise<Response> {
     events: results.map((r) => ({
       eventId: r.event_id, agentId: r.agent_id, taskId: r.task_id ?? undefined, status: r.status, activity: r.activity, kind: r.kind ?? undefined, timestamp: r.ts,
     })),
-  })
+  }, 200, CORS)
 }
 
 export async function handleRequest(req: Request, env: Env): Promise<Response> {
   const { pathname } = new URL(req.url)
   if (pathname !== '/events') return json({ error: 'not_found' }, 404)
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
   if (req.method === 'POST') return ingest(req, env)
   if (req.method === 'GET') return list(req, env)
   return json({ error: 'method_not_allowed' }, 405)

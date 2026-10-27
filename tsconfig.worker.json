@@ -11,6 +11,6 @@
     "skipLibCheck": true,
     "types": []
   },
-  "include": ["worker/src", "src/shared"],
+  "include": ["worker/src", "functions", "src/shared"],
   "exclude": ["**/*.test.ts"]
 }

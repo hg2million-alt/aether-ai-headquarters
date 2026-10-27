@@ -65,3 +65,14 @@ test('rotas desconhecidas → 404; métodos não permitidos → 405', async () =
   assert.equal((await handleRequest(new Request('https://hq.test/x'), env)).status, 404)
   assert.equal((await handleRequest(new Request('https://hq.test/events', { method: 'DELETE' }), env)).status, 405)
 })
+
+test('CORS: preflight e leitura autorizada permitem o navegador; 401 também carrega CORS', async () => {
+  const pre = await handleRequest(new Request('https://hq.test/events', { method: 'OPTIONS' }), env)
+  assert.equal(pre.status, 204)
+  assert.equal(pre.headers.get('access-control-allow-origin'), '*')
+  const bad = await handleRequest(new Request('https://hq.test/events'), env)
+  assert.equal(bad.status, 401)
+  assert.equal(bad.headers.get('access-control-allow-origin'), '*')
+  const ok = await handleRequest(new Request('https://hq.test/events', { headers: { authorization: 'Bearer read-token' } }), env)
+  assert.equal(ok.headers.get('access-control-allow-origin'), '*')
+})

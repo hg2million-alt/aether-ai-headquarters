@@ -42,5 +42,9 @@ Validado de ponta a ponta contra o Worker local (200 com segredo certo, 401 com 
 4. Configurar a automação original para chamar `send-event.mjs` nas etapas do fluxo.
 
 ## Estado da nuvem (atualizado)
-- **D1 criado** na conta Cloudflare do dono: `aether-hq` (id `372fef98-3f78-476e-a045-86725ae06c2c`, região ENAM) com a tabela `events` e o índice (esquema de `worker/schema.sql`).
-- **Falta:** publicar o Worker (`worker/`), definir o segredo `EVENT_SIGNING_SECRET`, publicar o site no Pages e proteger a leitura (Access).
+Arquitetura final: **um único projeto Cloudflare Pages `aether-hq`** serve o site e a API (`functions/events.ts` → mesmo `handleRequest` testado do Worker). Mesma origem = sem CORS para o site hospedado; o arquivo offline usa o endereço completo + CORS de leitura.
+- **D1** `aether-hq` (id `372fef98-3f78-476e-a045-86725ae06c2c`, ENAM) com a tabela `events` — criado e verificado.
+- **Projeto Pages** `aether-hq` (https://aether-hq.pages.dev/) criado, com o binding `DB` e os segredos `EVENT_SIGNING_SECRET` e `HQ_READ_TOKEN` já definidos (valores só no Cloudflare e nas mãos do dono — nunca no repositório).
+- **Pendente:** o primeiro deploy (`npx wrangler pages deploy dist --project-name aether-hq --branch main`) — bloqueado pelo controle de permissões do ambiente; precisa de confirmação do dono.
+- Leitura: o site pede a **chave de leitura** uma vez em Ajustes (fica só no aparelho). A automação usa `EVENT_SIGNING_SECRET` com `scripts/send-event.mjs`.
+- Depois de publicar: revogar o token de API usado na configuração e, se desejar, rotacionar as duas chaves.

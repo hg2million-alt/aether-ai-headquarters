@@ -48,6 +48,7 @@ export function Placeholder({ phase, children }: { phase: string; children: Reac
 const CONN: Record<Connection, string> = {
   not_configured: 'Automação não conectada · nenhum dado ainda',
   connecting: 'Conectando à automação…',
+  unauthorized: 'Chave de leitura necessária ou inválida · toque para informar',
   online: 'Conectado à automação',
   error: 'Sem conexão com a automação · mostrando o último estado',
 }
