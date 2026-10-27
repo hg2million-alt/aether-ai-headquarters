@@ -2,12 +2,11 @@ import { useEffect, useRef, type Ref } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { BoxGeometry, MeshLambertMaterial, MeshBasicMaterial, type Group, type Mesh } from 'three'
 import { colors } from '../lib/tokens'
-import { layout } from '../lib/office'
+import { FLOORS, layout } from '../lib/office'
 import type { AgentId, AgentStatus } from '../lib/types'
 
 const ROOM_W = 2.8
 const FLOOR_H = 2.2
-const FLOORS = 3
 const SX = ROOM_W * 2 + 0.2 // largura total do prédio
 const SZ = 3
 
@@ -16,6 +15,7 @@ const unit = new BoxGeometry(1, 1, 1)
 const m = {
   slab: new MeshLambertMaterial({ color: '#3a3a3e' }),
   wall: new MeshLambertMaterial({ color: '#2e2e32' }),
+  facade: new MeshLambertMaterial({ color: '#8a8a8e' }),
   floor: new MeshLambertMaterial({ color: '#46464a' }),
   furniture: new MeshLambertMaterial({ color: '#5a5a5f' }),
   robot: new MeshLambertMaterial({ color: '#d8d8da' }),
@@ -34,9 +34,9 @@ function B({ p, s, m: mat, ref }: { p: V3; s: V3; m: MeshLambertMaterial | MeshB
 function Rig() {
   const { camera, size } = useThree()
   useEffect(() => {
-    camera.position.set(14, 13, 14)
-    camera.lookAt(0, 3.1, 0)
-    camera.zoom = Math.min(size.width / 7.4, size.height / 9.6)
+    camera.position.set(14, 15, 14)
+    camera.lookAt(0, 4.6, 0)
+    camera.zoom = Math.min(size.width / 7.4, size.height / 12.4)
     camera.updateProjectionMatrix()
   }, [camera, size])
   return null
@@ -44,16 +44,50 @@ function Rig() {
 
 function Building() {
   const H = FLOORS * FLOOR_H
+  const pillar = (x: number, z: number) => <B key={`${x}${z}`} p={[x, H / 2, z]} s={[0.14, H, 0.14]} m={m.slab} />
   return (
     <group>
-      {Array.from({ length: FLOORS + 1 }, (_, i) => (
-        <B key={i} p={[0, i * FLOOR_H - 0.08, 0]} s={[SX, 0.16, SZ]} m={m.slab} />
+      {/* lajes com faixa de fachada na frente de cada andar */}
+      {Array.from({ length: FLOORS }, (_, i) => (
+        <group key={i}>
+          <B p={[0, i * FLOOR_H - 0.08, 0]} s={[SX, 0.16, SZ]} m={m.slab} />
+          <B p={[0, i * FLOOR_H + 0.1, SZ / 2]} s={[SX, 0.3, 0.1]} m={m.facade} />
+          <B p={[SX / 2, i * FLOOR_H + 0.1, 0]} s={[0.1, 0.3, SZ]} m={m.facade} />
+        </group>
       ))}
+      <B p={[0, H - 0.08, 0]} s={[SX + 0.3, 0.16, SZ + 0.3]} m={m.slab} />
       <B p={[0, H / 2, -SZ / 2 - 0.06]} s={[SX + 0.24, H, 0.12]} m={m.wall} />
       <B p={[-SX / 2 - 0.06, H / 2, 0]} s={[0.12, H, SZ]} m={m.wall} />
       {Array.from({ length: FLOORS }, (_, i) => (
         <B key={i} p={[0, i * FLOOR_H + 0.15, 0]} s={[0.08, 0.3, SZ]} m={m.wall} />
       ))}
+      {pillar(-SX / 2, SZ / 2)}
+      {pillar(0, SZ / 2)}
+      {pillar(SX / 2, SZ / 2)}
+      {pillar(SX / 2, -SZ / 2)}
+      {/* teto: platibanda, caixa d'água e antena */}
+      <B p={[0, H + 0.2, SZ / 2 + 0.1]} s={[SX + 0.3, 0.4, 0.1]} m={m.facade} />
+      <B p={[SX / 2 + 0.1, H + 0.2, 0]} s={[0.1, 0.4, SZ + 0.3]} m={m.facade} />
+      <B p={[0, H + 0.2, -SZ / 2 - 0.1]} s={[SX + 0.3, 0.4, 0.1]} m={m.facade} />
+      <B p={[-SX / 2 - 0.1, H + 0.2, 0]} s={[0.1, 0.4, SZ + 0.3]} m={m.facade} />
+      <B p={[-1.6, H + 0.55, -0.7]} s={[1.0, 0.7, 0.8]} m={m.furniture} />
+      <B p={[1.4, H + 0.35, -0.6]} s={[0.9, 0.3, 0.6]} m={m.furniture} />
+      <B p={[2.0, H + 1.0, -0.9]} s={[0.05, 1.6, 0.05]} m={m.robotDark} />
+    </group>
+  )
+}
+
+/** Térreo: recepção com balcão e porta. */
+function Lobby() {
+  return (
+    <group>
+      {[-0.5, 0.5].map((c) => (
+        <B key={c} p={[c * (ROOM_W + 0.1), 0.02, 0]} s={[ROOM_W - 0.1, 0.04, SZ - 0.1]} m={m.floor} />
+      ))}
+      <B p={[-1.5, 0.45, -0.2]} s={[1.8, 0.9, 0.6]} m={m.furniture} />
+      <B p={[-1.5, 0.95, -0.2]} s={[1.9, 0.06, 0.7]} m={m.robotDark} />
+      <B p={[1.6, 0.9, SZ / 2 - 0.05]} s={[1.0, 1.8, 0.06]} m={m.robotDark} />
+      <B p={[1.6, 0.9, SZ / 2 - 0.03]} s={[0.9, 1.7, 0.02]} m={m.screenOff} />
     </group>
   )
 }
@@ -139,7 +173,7 @@ function Room({ id, status, selected, still, onSelect }: { id: AgentId; status: 
 /** Sala sem agente: mesa de reunião decorativa. */
 function MeetingRoom() {
   return (
-    <group position={[0.5 * (ROOM_W + 0.1), 2 * FLOOR_H, 0]}>
+    <group position={[0.5 * (ROOM_W + 0.1), 3 * FLOOR_H, 0]}>
       <B p={[0, 0.02, 0]} s={[ROOM_W - 0.1, 0.04, SZ - 0.1]} m={m.floor} />
       <B p={[0, 0.5, 0.2]} s={[1.6, 0.06, 0.9]} m={m.furniture} />
       <B p={[0, 0.25, 0.2]} s={[0.1, 0.5, 0.1]} m={m.furniture} />
@@ -180,7 +214,7 @@ export default function OfficeScene({
   return (
     <Canvas
       orthographic
-      camera={{ position: [14, 13, 14], zoom: 40, near: 0.1, far: 80 }}
+      camera={{ position: [14, 15, 14], zoom: 40, near: 0.1, far: 80 }}
       dpr={[1, 1.5]}
       frameloop={!active ? 'never' : reducedMotion ? 'demand' : 'always'}
       gl={{ antialias: true, powerPreference: 'low-power' }}
@@ -194,6 +228,7 @@ export default function OfficeScene({
       {order.map((id) => (
         <Room key={id} id={id} status={statuses[id]} selected={selected === id} still={reducedMotion} onSelect={onSelect} />
       ))}
+      <Lobby />
       <MeetingRoom />
     </Canvas>
   )

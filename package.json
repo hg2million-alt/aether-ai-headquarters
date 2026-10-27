@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --noEmit",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "test": "node --test src/lib/gamification.test.ts"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

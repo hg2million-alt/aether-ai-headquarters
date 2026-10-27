@@ -6,5 +6,5 @@ Especificação completa: `PROJECT_SPEC.md`. Estado atual: `PROGRESS.md` (ler pr
 - Visual: apenas monocromático (tokens em `src/index.css` / `src/lib/tokens.ts`). Sem pixel art/cores/gradientes.
 - Dados simulados devem ser rotulados; nunca apresentar como resultado real.
 - Não tocar no repositório original da automação; não commitar segredos; não publicar em produção sem aprovação.
-- Comandos: `npm run dev` · `npm run build` (inclui typecheck).
+- Comandos: `npm run dev` · `npm run build` (inclui typecheck) · `npm test`.
 - Trabalhar uma fase por vez; atualizar `PROGRESS.md` ao terminar.

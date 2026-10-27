@@ -27,10 +27,11 @@ export const mockSnapshot: HqSnapshot = {
   ],
   nextRoutine: { at: null, label: 'Nenhuma rotina configurada' },
   activity: [
+    { eventId: 'sim_006', agentId: 'nova', taskId: 'demo_001', kind: 'demo_published', verified: false, status: 'completed', activity: 'Demo publicada (evento duplicado)', timestamp: '2026-10-27T13:43:00Z' },
     { eventId: 'sim_005', agentId: 'atlas', status: 'working', activity: 'Montando demo a partir de template', timestamp: '2026-10-27T15:10:00Z' },
-    { eventId: 'sim_004', agentId: 'nova', status: 'completed', activity: 'Demo publicada', timestamp: '2026-10-27T13:42:00Z' },
-    { eventId: 'sim_003', agentId: 'sentinel', status: 'completed', activity: 'Testes de links e build aprovados', timestamp: '2026-10-27T13:30:00Z' },
-    { eventId: 'sim_002', agentId: 'scout', status: 'completed', activity: 'Lead qualificado selecionado', timestamp: '2026-10-27T12:55:00Z' },
+    { eventId: 'sim_004', agentId: 'nova', taskId: 'demo_001', kind: 'demo_published', verified: false, status: 'completed', activity: 'Demo publicada', timestamp: '2026-10-27T13:42:00Z' },
+    { eventId: 'sim_003', agentId: 'sentinel', taskId: 'demo_001', kind: 'qa_passed', verified: false, status: 'completed', activity: 'Testes de links e build aprovados', timestamp: '2026-10-27T13:30:00Z' },
+    { eventId: 'sim_002', agentId: 'scout', taskId: 'demo_001', kind: 'lead_qualified', verified: false, status: 'completed', activity: 'Lead qualificado selecionado', timestamp: '2026-10-27T12:55:00Z' },
     { eventId: 'sim_001', agentId: 'mercury', status: 'failed', activity: 'Rascunho de abordagem recusado na revisão', timestamp: '2026-10-26T20:05:00Z' },
   ],
 }
