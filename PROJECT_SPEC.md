@@ -1,6 +1,6 @@
 # ÆTHER AI HEADQUARTERS — Especificação
 
-Plataforma mobile-first (Android) que serve de centro de operações da Æther Digital Studio (sites e landing pages premium). Dashboard + escritório virtual 3D + gamificação, alimentados futuramente por eventos autenticados da automação existente (repositório separado, **não** copiado para cá).
+Plataforma mobile-first (Android) que serve de centro de operações da Æther Digital Studio (sites e landing pages premium). Dashboard + escritório virtual em pixel art isométrica 2D + gamificação, alimentados futuramente por eventos autenticados da automação existente (repositório separado, **não** copiado para cá).
 
 ## Metas comerciais (hipóteses, não resultados)
 2 demos/dia, até 14/semana, ≥1 venda/semana; conversão hipotética 10–20%.
@@ -11,19 +11,19 @@ Monocromática, minimalista, premium, arquitetônica. Sem pixel art, sem cores d
 Paleta: bg #0B0B0B · bg2 #171719 · elevada #202022 · borda #353537 · texto #F5F5F5 · texto 2 #929296 · texto 3 #66666A · #FFF · #000.
 Tokens: `src/index.css` (`@theme`) e `src/lib/tokens.ts`.
 
-**Exceção (decisão do dono):** a cena 3D do escritório segue a referência quente (tijolo, madeira, luz âmbar, plantas) e os robôs vestem roupas por função (SCOUT colete/boné explorador, ATLAS moletom/fone, SENTINEL jaleco/óculos de proteção, NOVA macacão/headset de piloto, MERCURY terno/gravata). A UI fora da cena permanece monocromática.
+**Direção artística do escritório (decisão do dono):** pixel art isométrica 2D estilo jogo de gerenciamento de escritório (tijolo aparente, piso de madeira, janelas grandes, plantas, luz aconchegante), cores moderadas apenas dentro da cena; a UI fora dela permanece monocromática. O 3D foi abandonado (decisão posterior).
 Ajuste de acessibilidade: texto discreto `fg-3` = #818185 (era #66666A, contraste 3,1:1 < AA).
 
 ## Mobile-first
 Larguras 360/375/390/412/430. Navegação inferior, alvos ≥48px, uso com uma mão, sem scroll horizontal, safe areas, movimento reduzido respeitado. Tablet/desktop secundário (nav lateral).
 
 ## Stack
-React + TypeScript + Vite + Tailwind v4. 3D: Three.js + React Three Fiber (Fase 3, lazy, com fallback 2D). Futuro: Cloudflare Workers + D1; hospedagem Cloudflare Pages. Sem APIs pagas.
+React + TypeScript + Vite + Tailwind v4. Escritório: Canvas 2D (pixel art, sprites em `src/office2d/`); sem Three.js. Futuro: Cloudflare Workers + D1; hospedagem Cloudflare Pages. Sem APIs pagas.
 
 ## Dashboard (Fase 2)
 Meta diária/semanal, leads qualificados, sites em desenvolvimento/publicados, demos apresentadas, negociações, vendas, receita registrada, agentes ativos/descansando, próxima rotina, histórico. Metas e resultados separados; dados simulados sempre rotulados como tal.
 
-## Escritório 3D (Fases 3–4)
+## Escritório em pixel art (Fases 3–4, reformulado)
 Escritório aberto de UM andar, em corte, sem teto (diorama): recepção no térreo, 3 andares de escritórios — SCOUT/ATLAS 1º, SENTINEL/NOVA 2º, MERCURY 3º, teto com platibanda; sala de reunião decorativa sem agente. Low-poly, piso grafite, iluminação branca suave. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
 Estados: idle, sleeping, working, completed, failed, unknown. Todos inativos → modo noturno. Sem confirmação confiável → `unknown`; nunca inventar tarefas.
 Otimização: materiais compartilhados, poucas luzes, pixel ratio limitado, lazy load, pausa de render, fallback 2D.
@@ -44,4 +44,4 @@ Evitar múltiplos subagentes; reutilizar templates; configuração por JSON; scr
 Sem credenciais no GitHub; sem dados privados de leads no frontend público; sem pagamentos automáticos; sem publicar em produção sem aprovação; repositório original intocado.
 
 ## Fases
-1 Fundação · 2 Dashboard · 3 Escritório 3D · 4 Expansão · 5 Gamificação · 6 Integração · 7 Testes/Publicação.
+1 Fundação · 2 Dashboard · 3 Escritório (pixel art; piloto de 2 estações) · 4 Expansão · 5 Gamificação · 6 Integração · 7 Testes/Publicação.
