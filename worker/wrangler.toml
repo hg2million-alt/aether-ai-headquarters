@@ -1,0 +1,11 @@
+# Esqueleto — NÃO publicar sem aprovação. Sem segredos neste arquivo.
+# Segredos: `wrangler secret put EVENT_SIGNING_SECRET` e `wrangler secret put HQ_READ_TOKEN`.
+name = "aether-hq-events"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aether-hq"
+database_id = "REPLACE_AFTER_d1_create"

@@ -1,6 +1,6 @@
 import { Component, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Badge, Card, Label, PageHeader, SimBanner } from '../components/ui'
-import { mockSnapshot as snap } from '../data/mock'
+import { useSnapshot } from '../data/source'
 import { formatDateTime } from '../lib/format'
 import { isNight } from '../lib/office'
 import type { AgentId, AgentStatus } from '../lib/types'
@@ -20,9 +20,10 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
 }
 
 const states: AgentStatus[] = ['working', 'idle', 'sleeping', 'completed', 'failed', 'unknown']
-const initial = Object.fromEntries(snap.agents.map((a) => [a.id, a.status])) as Record<AgentId, AgentStatus>
 
 export function Office() {
+  const snap = useSnapshot()
+  const initial = useMemo(() => Object.fromEntries(snap.agents.map((a) => [a.id, a.status])) as Record<AgentId, AgentStatus>, [snap])
   const box = useRef<HTMLDivElement>(null)
   const [webgl] = useState(hasWebGL)
   const [reduced] = useState(prefersReducedMotion)

@@ -1,9 +1,10 @@
 import { ActivityList } from '../components/ActivityList'
 import { Card, Label, PageHeader, Progress, SimBanner, Stat } from '../components/ui'
-import { mockSnapshot as s } from '../data/mock'
+import { useSnapshot } from '../data/source'
 import { formatBRL } from '../lib/format'
 
 export function Dashboard() {
+  const s = useSnapshot()
   const { funnel: f, agents } = s
   const active = agents.filter((a) => a.status === 'working').length
   const resting = agents.filter((a) => a.status === 'idle' || a.status === 'sleeping').length

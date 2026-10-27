@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Badge, Card, Label, PageHeader, SimBanner } from '../components/ui'
-import { mockSnapshot as snap } from '../data/mock'
+import { useSnapshot } from '../data/source'
 import { formatDateTime } from '../lib/format'
 import { computeGamification, KIND_LABEL, levelFor } from '../lib/gamification'
 
@@ -20,10 +20,11 @@ function XpBar({ xp }: { xp: number }) {
 }
 
 export function Agents() {
+  const snap = useSnapshot()
   const [preview, setPreview] = useState(false)
   const g = useMemo(
     () => computeGamification(snap.activity, { includeUnverified: preview, dailyTarget: snap.goals.dailyTarget }),
-    [preview],
+    [preview, snap],
   )
   const unlocked = g.achievements.filter((a) => a.unlockedAt).length
   const nameOf = (id: string) => snap.agents.find((a) => a.id === id)?.name ?? id
