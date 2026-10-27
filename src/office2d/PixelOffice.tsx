@@ -11,7 +11,7 @@ export type Zoom = 1 | 2 | 3
 export interface FocusRequest { room: RoomId; n: number }
 
 export function PixelOffice({
-  states, night = false, selected = null, onSelect, active = true, reducedMotion = false, zoom = 2, follow = false, focus = null, onUserPan, onLabels,
+  states, night = false, selected = null, onSelect, active = true, reducedMotion = false, zoom = 2, follow = false, focus = null, showNames = false, onUserPan, onLabels,
 }: {
   states: Partial<Record<AgentId, AgentStatus>>
   night?: boolean
@@ -22,6 +22,7 @@ export function PixelOffice({
   zoom?: Zoom
   follow?: boolean
   focus?: FocusRequest | null
+  showNames?: boolean
   onUserPan?: () => void
   onLabels?: (labels: Partial<Record<AgentId, string>>) => void
 }) {
@@ -30,8 +31,8 @@ export function PixelOffice({
   const [cssW, setCssW] = useState(360)
   const world = useMemo(() => new World(states), []) // eslint-disable-line react-hooks/exhaustive-deps
   const cam = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null)
-  const live = useRef({ states, night, selected, follow, zoom })
-  live.current = { states, night, selected, follow, zoom }
+  const live = useRef({ states, night, selected, follow, zoom, showNames })
+  live.current = { states, night, selected, follow, zoom, showNames }
   const lastLabels = useRef('')
 
   const vw = Math.max(60, Math.floor(cssW / zoom))
@@ -58,7 +59,7 @@ export function PixelOffice({
     c.x += (c.tx - c.x) * 0.22
     c.y += (c.ty - c.y) * 0.22
     ctx.imageSmoothingEnabled = false
-    world.draw(ctx, Math.round(c.x - vw / 2), Math.round(c.y - vh / 2), vw, vh, L.states, L.night, L.selected)
+    world.draw(ctx, Math.round(c.x - vw / 2), Math.round(c.y - vh / 2), vw, vh, L.states, L.night, L.selected, L.showNames)
     if (onLabels) {
       const m: Partial<Record<AgentId, string>> = {}
       for (const id of AGENT_ORDER) m[id] = world.label(id)
@@ -110,7 +111,7 @@ export function PixelOffice({
     return () => clearInterval(id)
   }, [active, reducedMotion, world, states, render])
 
-  useEffect(render, [render, night, selected, follow, zoom, vw, vh])
+  useEffect(render, [render, night, selected, follow, zoom, vw, vh, showNames])
 
   const drag = useRef<{ x: number; y: number; moved: number } | null>(null)
 

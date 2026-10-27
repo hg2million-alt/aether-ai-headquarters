@@ -1,30 +1,67 @@
 import { useEffect, useState } from 'react'
-import type { HqSnapshot } from '../lib/types'
-import { mockSnapshot } from './mock'
+import type { Connection, HqSnapshot } from '../lib/types'
+import { buildSnapshot, parseEvents } from './live'
 
 /**
- * Fonte de dados do HQ. Hoje: simulada. Fase 7+: trocar `load` por chamada ao Worker
- * (GET /events atrás de Cloudflare Access) e montar o snapshot com `source: 'verified'`.
- * Nenhum segredo pode ficar no bundle do frontend.
+ * Fonte de dados do HQ: eventos autenticados vindos do Worker (GET /events). Sem URL configurada,
+ * o painel fica zerado ("não conectado"). Nenhum segredo no frontend: o acesso de leitura deve ser
+ * protegido por Cloudflare Access (cookie de sessão) — ver INTEGRATION.md.
  */
-export interface HqDataSource {
-  initial: HqSnapshot
-  load(): Promise<HqSnapshot>
+const KEY = 'aether.eventsUrl'
+const POLL_MS = 15000
+
+export function getEventsUrl(): string {
+  try {
+    return localStorage.getItem(KEY) ?? import.meta.env.VITE_EVENTS_URL ?? ''
+  } catch {
+    return import.meta.env.VITE_EVENTS_URL ?? ''
+  }
 }
 
-export const dataSource: HqDataSource = {
-  initial: mockSnapshot,
-  load: async () => mockSnapshot,
+export function setEventsUrl(url: string) {
+  try {
+    if (url) localStorage.setItem(KEY, url)
+    else localStorage.removeItem(KEY)
+  } catch {
+    /* sem armazenamento: vale só nesta sessão */
+  }
+  window.dispatchEvent(new Event('aether-config'))
 }
+
+export async function fetchSnapshot(url: string): Promise<HqSnapshot> {
+  if (!url) return buildSnapshot([], 'not_configured')
+  const res = await fetch(url, { credentials: 'include', headers: { accept: 'application/json' } })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return buildSnapshot(parseEvents(await res.json()), 'online')
+}
+
+const empty = (c: Connection): HqSnapshot => buildSnapshot([], c)
 
 export function useSnapshot(): HqSnapshot {
-  const [snap, setSnap] = useState(dataSource.initial)
+  const [url, setUrl] = useState(getEventsUrl)
+  const [snap, setSnap] = useState<HqSnapshot>(() => empty(getEventsUrl() ? 'connecting' : 'not_configured'))
+
+  useEffect(() => {
+    const on = () => setUrl(getEventsUrl())
+    window.addEventListener('aether-config', on)
+    return () => window.removeEventListener('aether-config', on)
+  }, [])
+
   useEffect(() => {
     let alive = true
-    dataSource.load().then((s) => alive && setSnap(s)).catch(() => {}) // falha: mantém o último estado conhecido
+    const tick = () =>
+      fetchSnapshot(url)
+        .then((s) => alive && setSnap(s))
+        .catch(() => alive && setSnap((p) => ({ ...p, connection: 'error' }))) // mantém o último estado conhecido
+    setSnap((p) => (url ? { ...p, connection: 'connecting' } : empty('not_configured')))
+    tick()
+    if (!url) return () => { alive = false }
+    const id = setInterval(tick, POLL_MS)
     return () => {
       alive = false
+      clearInterval(id)
     }
-  }, [])
+  }, [url])
+
   return snap
 }

@@ -1,6 +1,6 @@
 import type { AgentId, AgentStatus } from '../lib/types'
 import { Sim, ACTIVITY_LABEL, type AgentSim } from './behavior'
-import { bubbleSprite, charSprite, handsSprite, headSprite, SPRITE_BASE, SPRITE_W, STAND_BASE, STAND_W, standSprite, type StandAct } from './characters'
+import { bubbleSprite, charSprite, handsSprite, headSprite, nameTag, SPRITE_BASE, SPRITE_W, STAND_BASE, STAND_W, standSprite, type StandAct } from './characters'
 import { buildFurniture, type Ent, type RenderCtx } from './furniture'
 import { AGENT_ORDER, DESK_W, FURN, deskX } from './layout'
 import { buildPartitions } from './partitions'
@@ -15,6 +15,7 @@ export type Statuses = Partial<Record<AgentId, AgentStatus>>
 
 interface Item { depth: number; draw: (ctx: CanvasRenderingContext2D, cx: number, cy: number) => void; x0: number; y0: number; x1: number; y1: number }
 
+const AGENT_NAMES: Record<AgentId, string> = { scout: 'SCOUT', atlas: 'ATLAS', sentinel: 'SENTINEL', nova: 'NOVA', mercury: 'MERCURY' }
 const FRAME_STEP = 8 // quadros de animação por segundo
 
 /** Mundo completo: fundo, móveis, divisórias, agentes e câmera. */
@@ -78,7 +79,7 @@ export class World {
     return a.walking ? `Andando · ${ACTIVITY_LABEL[a.act]}` : ACTIVITY_LABEL[a.act]
   }
 
-  private agentItems(a: AgentSim, st: AgentStatus, anim: number, selected: AgentId | null): Item[] {
+  private agentItems(a: AgentSim, st: AgentStatus, anim: number, selected: AgentId | null, showNames: boolean): Item[] {
     const style = STYLES[a.id]
     const items: Item[] = []
     const add = (depth: number, x: number, y: number, w: number, h: number, draw: Item['draw']) => items.push({ depth, x0: x, y0: y, x1: x + w, y1: y + h, draw })
@@ -140,18 +141,17 @@ export class World {
       add(1e4, bx, by, bub.width, bub.height, blit(bub, bx, by))
       top = by
     }
-    if (selected === a.id) {
-      const sy = top - 6 + (anim % 4 < 2 ? 0 : 1)
-      add(1e4 + 1, ax - 3, sy, 8, 5, (ctx, cx, cy) => {
-        ctx.fillStyle = '#ffffff'
-        for (let k = 0; k < 4; k++) ctx.fillRect(ax - 3 + k - cx, sy + k - cy, 7 - k * 2, 1)
-      })
+    if (selected === a.id || showNames) {
+      const tag = nameTag(AGENT_NAMES[a.id], STYLES[a.id].shirt[2])
+      const ty = top - tag.height - 1 + (selected === a.id && anim % 4 >= 2 ? 1 : 0)
+      const tx = ax - Math.floor(tag.width / 2)
+      add(1e4 + (selected === a.id ? 2 : 1), tx, ty, tag.width, tag.height, blit(tag, tx, ty))
     }
     return items
   }
 
   /** Desenha a região (cx, cy, vw, vh) do mundo. */
-  draw(ctx: CanvasRenderingContext2D, cx: number, cy: number, vw: number, vh: number, statuses: Statuses, night: boolean, selected: AgentId | null) {
+  draw(ctx: CanvasRenderingContext2D, cx: number, cy: number, vw: number, vh: number, statuses: Statuses, night: boolean, selected: AgentId | null, showNames = false) {
     ctx.fillStyle = '#0b0b0b'
     ctx.fillRect(0, 0, vw, vh)
     ctx.drawImage(this.bg, cx, cy, vw, vh, 0, 0, vw, vh)
@@ -163,7 +163,7 @@ export class World {
       if (!vis(sp.x, sp.y, sp.x + sp.canvas.width, sp.y + sp.canvas.height)) continue
       items.push({ depth: s.depth, x0: sp.x, y0: sp.y, x1: sp.x + sp.canvas.width, y1: sp.y + sp.canvas.height, draw: (c, x, y) => c.drawImage(sp.canvas, sp.x - x, sp.y - y) })
     }
-    for (const a of this.sim.agents) for (const it of this.agentItems(a, statuses[a.id] ?? 'unknown', this.anim, selected)) if (vis(it.x0, it.y0, it.x1, it.y1)) items.push(it)
+    for (const a of this.sim.agents) for (const it of this.agentItems(a, statuses[a.id] ?? 'unknown', this.anim, selected, showNames)) if (vis(it.x0, it.y0, it.x1, it.y1)) items.push(it)
     items.sort((a, b) => a.depth - b.depth)
     for (const it of items) it.draw(ctx, cx, cy)
     if (night) {

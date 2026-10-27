@@ -67,7 +67,7 @@ const dayOf = (iso: string) => dayFmt.format(new Date(iso))
 const AGENTS: AgentId[] = ['scout', 'atlas', 'sentinel', 'nova', 'mercury']
 
 interface Options {
-  /** Apenas para pré-visualização com dados simulados. Padrão: só eventos verificados. */
+  /** Inclui eventos não verificados (uso interno/testes). Padrão: só eventos verificados. */
   includeUnverified?: boolean
   dailyTarget?: number
 }

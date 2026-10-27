@@ -389,3 +389,25 @@ export function headSprite(key: string, style: CharStyle): HTMLCanvasElement {
   cache.set(id, c)
   return c
 }
+
+/** Plaquinha com o nome do agente (fonte de pixels 3×5), com faixa na cor da roupa e ponteiro para baixo. */
+export function nameTag(name: string, color: string): HTMLCanvasElement {
+  const id = `tag|${name}|${color}`
+  const hit = cache.get(id)
+  if (hit) return hit
+  const tw = name.length * 4 - 1
+  const w = tw + 8, h = 11
+  const p = new Pix(w, h + 3)
+  const bg = rgb('#17181a'), fg = rgb('#f5f5f5')
+  p.rect(0, 0, w, h, bg)
+  p.rect(0, 0, 2, h, rgb(color))
+  for (let j = 0; j < 5; j++) [...name].forEach((ch, i) => [0, 1, 2].forEach((k) => GLYPH[ch]?.[j]?.[k] === '#' && p.set(4 + i * 4 + k, 3 + j, fg)))
+  const m = Math.floor(w / 2)
+  p.set(m - 1, h, bg); p.set(m, h, bg); p.set(m + 1, h, bg); p.set(m, h + 1, bg)
+  // borda clara de 1 px
+  for (let x = 0; x < w; x++) { p.set(x, 0, rgb('#6a6a70')); p.set(x, h - 1, rgb('#6a6a70')) }
+  for (let y = 0; y < h; y++) p.set(w - 1, y, rgb('#6a6a70'))
+  const c = p.toCanvas()
+  cache.set(id, c)
+  return c
+}

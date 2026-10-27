@@ -1,6 +1,6 @@
 # Integração Automação → Worker → D1 → HQ (plano; nada publicado)
 
-**Estado:** contrato, validação, HMAC, deduplicação e Worker/D1 implementados e testados localmente (`npm test`). Frontend segue em dados simulados.
+**Estado:** contrato, validação, HMAC, deduplicação e Worker/D1 implementados e testados localmente (`npm test`). O frontend não tem mais dados simulados: lê `GET /events` do endereço configurado em **Ajustes** (sem endereço = tudo zerado).
 
 ## Fluxo
 1. Automação (repo original) envia `POST /events` com JSON do contrato (`src/shared/events.ts`) e headers:
@@ -21,3 +21,22 @@
 - Build: `npm run build` · saída: `dist` · Node 22 (`.node-version`). Rotas por hash: sem regras de redirect.
 - `public/_headers` já traz CSP estrita, nosniff, Referrer-Policy, Permissions-Policy, COOP e frame-ancestors (testado com servidor local sem violações; ao ligar a API, adicionar a origem do Worker em `connect-src`).
 - Antes de publicar: aprovação do dono, Cloudflare Access no site, Worker/D1 criados conforme os passos acima.
+
+## Como a automação envia eventos (pronto para usar)
+`scripts/send-event.mjs` valida, assina (HMAC) e envia um evento. O segredo vem só de variável de ambiente:
+
+```
+AETHER_URL=https://<worker>/events AETHER_SECRET=<segredo> \
+node scripts/send-event.mjs <agente> <status> <atividade> [kind] [taskId]
+# ex.: início de trabalho
+node scripts/send-event.mjs atlas working building "" demo_001
+# ex.: demo publicada (rende XP, status completed + kind)
+node scripts/send-event.mjs nova completed publishing demo_published demo_001
+```
+Validado de ponta a ponta contra o Worker local (200 com segredo certo, 401 com errado). Cada agente deve enviar `working` ao começar uma etapa e `completed`/`failed` ao terminar; sem sinal por 6 h o HQ mostra "sem sinal".
+
+## O que falta para o HQ funcionar de verdade
+1. Aprovar a publicação: criar D1 + Worker (`wrangler`), `wrangler secret put EVENT_SIGNING_SECRET`.
+2. Decidir a leitura pelo navegador: Cloudflare Access (login) + validação do JWT no Worker; hoje `GET /events` exige token de leitura que **não** pode ir ao frontend, e a página só consegue ler via sessão do Access. CORS do Worker para a origem do HQ.
+3. Colar o endereço do Worker em Ajustes (vale por aparelho, sem segredo).
+4. Configurar a automação original para chamar `send-event.mjs` nas etapas do fluxo.

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { Connection } from '../lib/types'
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <section className={`rounded-2xl border border-line bg-bg-2 p-4 ${className}`}>{children}</section>
@@ -44,11 +45,19 @@ export function Placeholder({ phase, children }: { phase: string; children: Reac
   )
 }
 
-export function SimBanner() {
+const CONN: Record<Connection, string> = {
+  not_configured: 'Automação não conectada · nenhum dado ainda',
+  connecting: 'Conectando à automação…',
+  online: 'Conectado à automação',
+  error: 'Sem conexão com a automação · mostrando o último estado',
+}
+
+export function ConnectionBanner({ state }: { state: Connection }) {
+  if (state === 'online') return null
   return (
-    <div role="note" className="mx-5 mb-4 rounded-xl border border-dashed border-line px-4 py-2.5 text-[11px] uppercase tracking-label text-fg-2">
-      Dados simulados · não são resultados reais
-    </div>
+    <a href="#/settings" role="status" className="mx-5 mb-4 block rounded-xl border border-dashed border-line px-4 py-2.5 text-[11px] uppercase tracking-label text-fg-2">
+      {CONN[state]}
+    </a>
   )
 }
 

@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Badge, Card, Label, PageHeader, SimBanner } from '../components/ui'
+import { useMemo } from 'react'
+import { Badge, Card, ConnectionBanner, Label, PageHeader } from '../components/ui'
 import { useSnapshot } from '../data/source'
 import { formatDateTime } from '../lib/format'
 import { computeGamification, KIND_LABEL, levelFor } from '../lib/gamification'
@@ -21,30 +21,14 @@ function XpBar({ xp }: { xp: number }) {
 
 export function Agents() {
   const snap = useSnapshot()
-  const [preview, setPreview] = useState(false)
-  const g = useMemo(
-    () => computeGamification(snap.activity, { includeUnverified: preview, dailyTarget: snap.goals.dailyTarget }),
-    [preview, snap],
-  )
+  const g = useMemo(() => computeGamification(snap.activity, { dailyTarget: snap.goals.dailyTarget }), [snap])
   const unlocked = g.achievements.filter((a) => a.unlockedAt).length
   const nameOf = (id: string) => snap.agents.find((a) => a.id === id)?.name ?? id
 
   return (
     <>
       <PageHeader title="Agentes" subtitle="XP só por eventos verificados, sem duplicidade." />
-      {snap.source === 'simulated' && <SimBanner />}
-
-      <div className="mx-5 mb-4">
-        <button
-          onClick={() => setPreview((v) => !v)}
-          aria-pressed={preview}
-          className={`min-h-12 w-full rounded-xl border text-[10px] uppercase tracking-[0.08em] ${preview ? 'border-white bg-elevated text-white' : 'border-line text-fg-2'}`}
-        >
-          Pré-visualizar com eventos simulados
-        </button>
-        {!preview && <p className="mt-2 text-xs text-fg-3">Nenhum evento verificado ainda: o XP real é 0.</p>}
-        {preview && <p className="mt-2 text-xs text-fg-3">Simulação: estes eventos não são verificados e não contam como XP real.</p>}
-      </div>
+      <ConnectionBanner state={snap.connection} />
 
       <Card className="mx-5">
         <Label>XP total</Label>

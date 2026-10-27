@@ -1,5 +1,6 @@
 import { ActivityList } from '../components/ActivityList'
-import { Card, Label, PageHeader, Progress, SimBanner, Stat } from '../components/ui'
+import { AgentBoard } from '../components/AgentBoard'
+import { Card, ConnectionBanner, Label, PageHeader, Progress, Stat } from '../components/ui'
 import { useSnapshot } from '../data/source'
 import { formatBRL } from '../lib/format'
 
@@ -13,9 +14,12 @@ export function Dashboard() {
   return (
     <>
       <PageHeader title="Painel" subtitle="Metas e resultados são exibidos separadamente." />
-      {s.source === 'simulated' && <SimBanner />}
+      <ConnectionBanner state={s.connection} />
 
-      <h2 className="px-5 pb-3"><Label>Metas · demos publicadas</Label></h2>
+      <AgentBoard snap={s} />
+
+
+      <h2 className="px-5 pb-3 pt-8"><Label>Metas · demos publicadas</Label></h2>
       <Card className="mx-5 space-y-6">
         <Progress label="Hoje" value={s.progress.publishedToday} target={s.goals.dailyTarget} />
         <Progress label="Semana" value={s.progress.publishedThisWeek} target={s.goals.weeklyTarget} />
@@ -27,7 +31,7 @@ export function Dashboard() {
         <Stat label="Em produção" value={String(f.demosInDevelopment)} hint={`${f.demosProduced} produzidas`} />
         <Stat label="Publicadas" value={String(f.demosPublished)} />
         <Stat label="Apresentadas" value={String(f.demosPresented)} hint={`${f.repliesReceived} respostas`} />
-        <Stat label="Negociações" value={String(f.negotiations)} hint={`${f.proposalsSent} propostas enviadas`} />
+        <Stat label="Negociações" value={String(f.negotiations)} hint={`${f.proposalsSent} propostas preparadas`} />
         <Stat label="Vendas" value={String(f.salesConfirmed)} hint="confirmadas" />
         <div className="col-span-2">
           <Stat label="Receita registrada" value={formatBRL(f.revenueBRL)} />
@@ -36,7 +40,7 @@ export function Dashboard() {
 
       <h2 className="px-5 pb-3 pt-8"><Label>Operação</Label></h2>
       <div className="grid grid-cols-2 gap-3 px-5">
-        <Stat label="Agentes ativos" value={String(active)} hint={unknown ? `${unknown} desconhecido` : undefined} />
+        <Stat label="Agentes ativos" value={String(active)} hint={unknown ? `${unknown} sem sinal` : undefined} />
         <Stat label="Descansando" value={String(resting)} />
         <Card className="col-span-2">
           <Label>Próxima rotina</Label>

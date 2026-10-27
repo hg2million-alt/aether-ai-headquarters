@@ -1,7 +1,7 @@
 export type AgentId = 'scout' | 'atlas' | 'sentinel' | 'nova' | 'mercury'
 export type AgentStatus = 'idle' | 'sleeping' | 'working' | 'completed' | 'failed' | 'unknown'
-/** 'simulated' = demonstrativo; 'verified' = vindo de evento autenticado (Fase 6). */
-export type DataSource = 'simulated' | 'verified'
+/** Estado da conexão com a automação (Worker). */
+export type Connection = 'not_configured' | 'connecting' | 'online' | 'error'
 
 export interface Funnel {
   leadsFound: number
@@ -63,7 +63,7 @@ export interface NextRoutine {
 }
 
 export interface HqSnapshot {
-  source: DataSource
+  connection: Connection
   goals: Goals
   progress: GoalProgress
   funnel: Funnel
