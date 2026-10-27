@@ -1,15 +1,12 @@
 import type { AgentId, AgentStatus } from './types'
 
-/** Andares do prédio: 0 = recepção (térreo), 1–3 = escritórios. */
-export const FLOORS = 4
-
-/** Posição de cada escritório: andar e coluna (0 = esquerda). */
-export const layout: Record<AgentId, { floor: number; col: number }> = {
-  scout: { floor: 1, col: 0 },
-  atlas: { floor: 1, col: 1 },
-  sentinel: { floor: 2, col: 0 },
-  nova: { floor: 2, col: 1 },
-  mercury: { floor: 3, col: 0 },
+/** Posição de cada mesa no escritório aberto (centro da mesa, em unidades da cena). */
+export const layout: Record<AgentId, { x: number; z: number }> = {
+  scout: { x: -2.2, z: -2.15 },
+  atlas: { x: 0, z: -2.15 },
+  sentinel: { x: 2.2, z: -2.15 },
+  nova: { x: -1.1, z: 0.45 },
+  mercury: { x: 1.1, z: 0.45 },
 }
 
 const resting: AgentStatus[] = ['idle', 'sleeping']

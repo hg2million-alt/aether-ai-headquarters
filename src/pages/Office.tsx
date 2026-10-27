@@ -52,9 +52,9 @@ export function Office() {
 
   return (
     <>
-      <PageHeader title="Escritório" subtitle="Prédio da Æther: um escritório por função." />
+      <PageHeader title="Escritório" subtitle="Escritório aberto da Æther: uma mesa por função." />
       <SimBanner />
-      <div ref={box} className="mx-5 aspect-[4/5] max-h-[34rem] overflow-hidden rounded-2xl border border-line bg-bg-2">
+      <div ref={box} className="mx-5 aspect-[4/3] overflow-hidden rounded-2xl border border-line bg-bg-2">
         {webgl ? (
           <Boundary>
             <Suspense fallback={<p className="p-6 text-center text-xs text-fg-3">Carregando cena…</p>}>

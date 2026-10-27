@@ -2,20 +2,21 @@ import { useEffect, useRef, type Ref } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { BoxGeometry, MeshLambertMaterial, MeshBasicMaterial, type Group, type Mesh } from 'three'
 import { colors } from '../lib/tokens'
-import { FLOORS, layout } from '../lib/office'
+import { layout } from '../lib/office'
 import type { AgentId, AgentStatus } from '../lib/types'
 
-const ROOM_W = 2.8
-const FLOOR_H = 2.2
-const SX = ROOM_W * 2 + 0.2 // largura total do prédio
-const SZ = 3
+const RX = 7.2 // largura do escritório (x)
+const RZ = 5.4 // profundidade (z)
+const WALL_H = 3
 
 /** Geometria e materiais compartilhados (monocromáticos). */
 const unit = new BoxGeometry(1, 1, 1)
 const m = {
   slab: new MeshLambertMaterial({ color: '#3a3a3e' }),
   wall: new MeshLambertMaterial({ color: '#2e2e32' }),
-  facade: new MeshLambertMaterial({ color: '#8a8a8e' }),
+  glass: new MeshLambertMaterial({ color: '#8e8e93' }),
+  light: new MeshBasicMaterial({ color: colors.white }),
+  leaf: new MeshLambertMaterial({ color: '#9a9a9e' }),
   floor: new MeshLambertMaterial({ color: '#46464a' }),
   furniture: new MeshLambertMaterial({ color: '#5a5a5f' }),
   robot: new MeshLambertMaterial({ color: '#d8d8da' }),
@@ -23,6 +24,7 @@ const m = {
   eye: new MeshBasicMaterial({ color: colors.white }),
   screenOn: new MeshBasicMaterial({ color: colors.fg }),
   screenOff: new MeshBasicMaterial({ color: colors.black }),
+  zone: new MeshLambertMaterial({ color: '#3d3d41' }),
   marker: new MeshBasicMaterial({ color: colors.white }),
 }
 
@@ -34,60 +36,63 @@ function B({ p, s, m: mat, ref }: { p: V3; s: V3; m: MeshLambertMaterial | MeshB
 function Rig() {
   const { camera, size } = useThree()
   useEffect(() => {
-    camera.position.set(14, 15, 14)
-    camera.lookAt(0, 4.6, 0)
-    camera.zoom = Math.min(size.width / 7.4, size.height / 12.4)
+    camera.position.set(14, 12, 14)
+    camera.lookAt(0, 0.8, 0)
+    camera.zoom = Math.min(size.width / 10.4, size.height / 8)
     camera.updateProjectionMatrix()
   }, [camera, size])
   return null
 }
 
-function Building() {
-  const H = FLOORS * FLOOR_H
-  const pillar = (x: number, z: number) => <B key={`${x}${z}`} p={[x, H / 2, z]} s={[0.14, H, 0.14]} m={m.slab} />
+/** Base de diorama + paredes dos fundos e da esquerda (corte sem teto). */
+function Shell() {
   return (
     <group>
-      {/* lajes com faixa de fachada na frente de cada andar */}
-      {Array.from({ length: FLOORS }, (_, i) => (
-        <group key={i}>
-          <B p={[0, i * FLOOR_H - 0.08, 0]} s={[SX, 0.16, SZ]} m={m.slab} />
-          <B p={[0, i * FLOOR_H + 0.1, SZ / 2]} s={[SX, 0.3, 0.1]} m={m.facade} />
-          <B p={[SX / 2, i * FLOOR_H + 0.1, 0]} s={[0.1, 0.3, SZ]} m={m.facade} />
-        </group>
-      ))}
-      <B p={[0, H - 0.08, 0]} s={[SX + 0.3, 0.16, SZ + 0.3]} m={m.slab} />
-      <B p={[0, H / 2, -SZ / 2 - 0.06]} s={[SX + 0.24, H, 0.12]} m={m.wall} />
-      <B p={[-SX / 2 - 0.06, H / 2, 0]} s={[0.12, H, SZ]} m={m.wall} />
-      {Array.from({ length: FLOORS }, (_, i) => (
-        <B key={i} p={[0, i * FLOOR_H + 0.15, 0]} s={[0.08, 0.3, SZ]} m={m.wall} />
-      ))}
-      {pillar(-SX / 2, SZ / 2)}
-      {pillar(0, SZ / 2)}
-      {pillar(SX / 2, SZ / 2)}
-      {pillar(SX / 2, -SZ / 2)}
-      {/* teto: platibanda, caixa d'água e antena */}
-      <B p={[0, H + 0.2, SZ / 2 + 0.1]} s={[SX + 0.3, 0.4, 0.1]} m={m.facade} />
-      <B p={[SX / 2 + 0.1, H + 0.2, 0]} s={[0.1, 0.4, SZ + 0.3]} m={m.facade} />
-      <B p={[0, H + 0.2, -SZ / 2 - 0.1]} s={[SX + 0.3, 0.4, 0.1]} m={m.facade} />
-      <B p={[-SX / 2 - 0.1, H + 0.2, 0]} s={[0.1, 0.4, SZ + 0.3]} m={m.facade} />
-      <B p={[-1.6, H + 0.55, -0.7]} s={[1.0, 0.7, 0.8]} m={m.furniture} />
-      <B p={[1.4, H + 0.35, -0.6]} s={[0.9, 0.3, 0.6]} m={m.furniture} />
-      <B p={[2.0, H + 1.0, -0.9]} s={[0.05, 1.6, 0.05]} m={m.robotDark} />
+      <B p={[0, -0.15, 0]} s={[RX + 0.4, 0.3, RZ + 0.4]} m={m.slab} />
+      <B p={[0, 0.01, 0]} s={[RX, 0.04, RZ]} m={m.floor} />
+      <B p={[0, WALL_H / 2, -RZ / 2 - 0.08]} s={[RX + 0.4, WALL_H, 0.16]} m={m.wall} />
+      <B p={[-RX / 2 - 0.08, WALL_H / 2, 0]} s={[0.16, WALL_H, RZ]} m={m.wall} />
+      {/* janelas */}
+      {[-2.5, 2.5].map((x) => <B key={x} p={[x, 1.7, -RZ / 2 + 0.01]} s={[1.5, 1.3, 0.03]} m={m.glass} />)}
+      {[-0.6, 1.5].map((z) => <B key={z} p={[-RX / 2 + 0.01, 1.7, z]} s={[0.03, 1.3, 1.5]} m={m.glass} />)}
+      {/* faixas de luz */}
+      <B p={[0, WALL_H - 0.12, -RZ / 2 + 0.02]} s={[RX, 0.04, 0.04]} m={m.light} />
+      <B p={[-RX / 2 + 0.02, WALL_H - 0.12, 0]} s={[0.04, 0.04, RZ]} m={m.light} />
+      {/* telão */}
+      <B p={[0, 2.1, -RZ / 2 + 0.03]} s={[2.2, 0.9, 0.05]} m={m.robotDark} />
+      {[0, 1, 2].map((i) => <B key={i} p={[-0.6 + i * 0.1, 2.3 - i * 0.2, -RZ / 2 + 0.065]} s={[1.0 + i * 0.3, 0.05, 0.01]} m={m.eye} />)}
     </group>
   )
 }
 
-/** Térreo: recepção com balcão e porta. */
-function Lobby() {
+function Plant({ p }: { p: V3 }) {
+  return (
+    <group position={p}>
+      <B p={[0, 0.2, 0]} s={[0.4, 0.4, 0.4]} m={m.furniture} />
+      <B p={[0, 0.6, 0]} s={[0.55, 0.4, 0.55]} m={m.leaf} />
+      <B p={[0, 0.95, 0]} s={[0.4, 0.35, 0.4]} m={m.leaf} />
+      <B p={[0, 1.2, 0]} s={[0.22, 0.25, 0.22]} m={m.leaf} />
+    </group>
+  )
+}
+
+/** Mobiliário de apoio: sofá, mesa alta com banquetas, plantas. */
+function Decor() {
   return (
     <group>
-      {[-0.5, 0.5].map((c) => (
-        <B key={c} p={[c * (ROOM_W + 0.1), 0.02, 0]} s={[ROOM_W - 0.1, 0.04, SZ - 0.1]} m={m.floor} />
+      <B p={[-3.0, 0.25, 1.5]} s={[0.9, 0.3, 2.2]} m={m.furniture} />
+      <B p={[-3.4, 0.55, 1.5]} s={[0.2, 0.5, 2.2]} m={m.furniture} />
+      <B p={[2.8, 0.95, 1.7]} s={[1.0, 0.06, 0.7]} m={m.furniture} />
+      <B p={[2.8, 0.47, 1.7]} s={[0.08, 0.94, 0.08]} m={m.furniture} />
+      {[1.1, 2.3].map((z) => (
+        <group key={z}>
+          <B p={[2.0, 0.55, z + 0.3]} s={[0.32, 0.06, 0.32]} m={m.robotDark} />
+          <B p={[2.0, 0.27, z + 0.3]} s={[0.06, 0.54, 0.06]} m={m.robotDark} />
+        </group>
       ))}
-      <B p={[-1.5, 0.45, -0.2]} s={[1.8, 0.9, 0.6]} m={m.furniture} />
-      <B p={[-1.5, 0.95, -0.2]} s={[1.9, 0.06, 0.7]} m={m.robotDark} />
-      <B p={[1.6, 0.9, SZ / 2 - 0.05]} s={[1.0, 1.8, 0.06]} m={m.robotDark} />
-      <B p={[1.6, 0.9, SZ / 2 - 0.03]} s={[0.9, 1.7, 0.02]} m={m.screenOff} />
+      <Plant p={[-3.2, 0, -2.3]} />
+      <Plant p={[3.2, 0, -2.3]} />
+      <Plant p={[-3.2, 0, 2.3]} />
     </group>
   )
 }
@@ -144,20 +149,21 @@ function Robot({ id, status, still }: { id: AgentId; status: AgentStatus; still:
   )
 }
 
-function Room({ id, status, selected, still, onSelect }: { id: AgentId; status: AgentStatus; selected: boolean; still: boolean; onSelect: (id: AgentId) => void }) {
-  const { floor, col } = layout[id]
+function Station({ id, status, selected, still, onSelect }: { id: AgentId; status: AgentStatus; selected: boolean; still: boolean; onSelect: (id: AgentId) => void }) {
+  const { x, z } = layout[id]
   const on = status === 'working'
   return (
     <group
-      position={[(col - 0.5) * (ROOM_W + 0.1), floor * FLOOR_H, 0]}
+      position={[x, 0, z]}
       onClick={(e) => {
         e.stopPropagation()
         onSelect(id)
       }}
     >
-      <B p={[0, 0.02, 0]} s={[ROOM_W - 0.1, 0.04, SZ - 0.1]} m={m.floor} />
-      {selected && <B p={[0, 0.05, 0.3]} s={[ROOM_W - 0.3, 0.02, 0.06]} m={m.marker} />}
-      <group position={[0, 0, 0.15]} scale={0.7}>
+      {/* zona da mesa: área clicável e destaque de seleção */}
+      <B p={[0, 0.04, 1.0]} s={[2.0, 0.02, 2.6]} m={selected ? m.furniture : m.zone} />
+      {selected && <B p={[0, 0.06, 2.25]} s={[1.8, 0.02, 0.06]} m={m.marker} />}
+      <group position={[0, 0, 1.19]} scale={0.7}>
         <B p={[0, 0.78, -1.7]} s={[2.6, 0.08, 1.1]} m={m.furniture} />
         <B p={[-1.2, 0.37, -1.7]} s={[0.08, 0.74, 1]} m={m.furniture} />
         <B p={[1.2, 0.37, -1.7]} s={[0.08, 0.74, 1]} m={m.furniture} />
@@ -166,17 +172,6 @@ function Room({ id, status, selected, still, onSelect }: { id: AgentId; status: 
         <B p={[0, 1.38, -1.865]} s={[1, 0.55, 0.01]} m={on ? m.screenOn : m.screenOff} />
         <Robot id={id} status={status} still={still} />
       </group>
-    </group>
-  )
-}
-
-/** Sala sem agente: mesa de reunião decorativa. */
-function MeetingRoom() {
-  return (
-    <group position={[0.5 * (ROOM_W + 0.1), 3 * FLOOR_H, 0]}>
-      <B p={[0, 0.02, 0]} s={[ROOM_W - 0.1, 0.04, SZ - 0.1]} m={m.floor} />
-      <B p={[0, 0.5, 0.2]} s={[1.6, 0.06, 0.9]} m={m.furniture} />
-      <B p={[0, 0.25, 0.2]} s={[0.1, 0.5, 0.1]} m={m.furniture} />
     </group>
   )
 }
@@ -214,22 +209,21 @@ export default function OfficeScene({
   return (
     <Canvas
       orthographic
-      camera={{ position: [14, 15, 14], zoom: 40, near: 0.1, far: 80 }}
+      camera={{ position: [14, 12, 14], zoom: 40, near: 0.1, far: 80 }}
       dpr={[1, 1.5]}
       frameloop={!active ? 'never' : reducedMotion ? 'demand' : 'always'}
       gl={{ antialias: true, powerPreference: 'low-power' }}
       style={{ touchAction: 'pan-y' }}
-      aria-label="Prédio virtual 3D com os escritórios dos agentes"
+      aria-label="Escritório virtual 3D com as mesas dos agentes"
     >
       <Rig />
       <Lights night={night} />
       <Invalidator k={order.map((id) => statuses[id]).join() + selected} />
-      <Building />
+      <Shell />
+      <Decor />
       {order.map((id) => (
-        <Room key={id} id={id} status={statuses[id]} selected={selected === id} still={reducedMotion} onSelect={onSelect} />
+        <Station key={id} id={id} status={statuses[id]} selected={selected === id} still={reducedMotion} onSelect={onSelect} />
       ))}
-      <Lobby />
-      <MeetingRoom />
     </Canvas>
   )
 }
