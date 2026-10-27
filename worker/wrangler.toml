@@ -1,4 +1,4 @@
-# Esqueleto — NÃO publicar sem aprovação. Sem segredos neste arquivo.
+# Worker de eventos do Æther HQ. O ID do banco D1 não é segredo. Sem segredos neste arquivo.
 # Segredos: `wrangler secret put EVENT_SIGNING_SECRET` e `wrangler secret put HQ_READ_TOKEN`.
 name = "aether-hq-events"
 main = "src/index.ts"
@@ -8,4 +8,4 @@ workers_dev = false
 [[d1_databases]]
 binding = "DB"
 database_name = "aether-hq"
-database_id = "REPLACE_AFTER_d1_create"
+database_id = "372fef98-3f78-476e-a045-86725ae06c2c"

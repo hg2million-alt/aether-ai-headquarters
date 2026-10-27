@@ -40,3 +40,7 @@ Validado de ponta a ponta contra o Worker local (200 com segredo certo, 401 com 
 2. Decidir a leitura pelo navegador: Cloudflare Access (login) + validação do JWT no Worker; hoje `GET /events` exige token de leitura que **não** pode ir ao frontend, e a página só consegue ler via sessão do Access. CORS do Worker para a origem do HQ.
 3. Colar o endereço do Worker em Ajustes (vale por aparelho, sem segredo).
 4. Configurar a automação original para chamar `send-event.mjs` nas etapas do fluxo.
+
+## Estado da nuvem (atualizado)
+- **D1 criado** na conta Cloudflare do dono: `aether-hq` (id `372fef98-3f78-476e-a045-86725ae06c2c`, região ENAM) com a tabela `events` e o índice (esquema de `worker/schema.sql`).
+- **Falta:** publicar o Worker (`worker/`), definir o segredo `EVENT_SIGNING_SECRET`, publicar o site no Pages e proteger a leitura (Access).
