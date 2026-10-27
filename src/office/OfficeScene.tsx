@@ -3,7 +3,7 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { colors } from '../lib/tokens'
 import { layout } from '../lib/office'
 import type { AgentId, AgentStatus } from '../lib/types'
-import { m, unit } from './materials'
+import { geo, m, unit } from './materials'
 import { B, Robot } from './Robot'
 import { staticMeshes } from './staticScene'
 
@@ -42,10 +42,10 @@ function Station({ id, status, selected, still, onSelect }: { id: AgentId; statu
     >
       {/* área clicável invisível da mesa */}
       <mesh geometry={unit} material={m.hit} position={[0, 0.8, 1.0]} scale={[2.0, 1.8, 2.6]} />
-      {selected && <B p={[0, 0.07, 2.25]} s={[1.8, 0.02, 0.06]} k="marker" />}
+      {selected && <B g={geo.cyl} p={[0, 0.07, 2.25]} s={[1.7, 0.02, 0.1]} k="marker" />}
       <group position={[0, 0, 1.19]} scale={0.7}>
-        <B p={[0, 1.38, -1.865]} s={[1, 0.55, 0.01]} k={screen} />
-        {id === 'atlas' && <B p={[1.05, 1.3, -1.865]} s={[0.7, 0.42, 0.01]} k={screen} />}
+        <B g={geo.rbox(1, 0.55, 0.012, 0.01)} p={[0, 1.38, -1.865]} k={screen} />
+        {id === 'atlas' && <B g={geo.rbox(0.7, 0.42, 0.012, 0.01)} p={[1.05, 1.3, -1.865]} k={screen} />}
         <Robot id={id} status={status} still={still} />
       </group>
     </group>

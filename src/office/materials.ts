@@ -1,4 +1,5 @@
-import { BoxGeometry, MeshBasicMaterial, MeshLambertMaterial } from 'three'
+import { BoxGeometry, CapsuleGeometry, CylinderGeometry, MeshBasicMaterial, MeshLambertMaterial, SphereGeometry, TorusGeometry, type BufferGeometry } from 'three'
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 
 /**
  * Ambientação quente do escritório (tijolo, madeira, luz âmbar) — exceção deliberada
@@ -8,6 +9,22 @@ const L = (color: string) => new MeshLambertMaterial({ color })
 const U = (color: string) => new MeshBasicMaterial({ color }) // sem iluminação (luzes/telas)
 
 export const unit = new BoxGeometry(1, 1, 1)
+
+const cache = new Map<string, BufferGeometry>()
+const memo = (key: string, make: () => BufferGeometry) => {
+  if (!cache.has(key)) cache.set(key, make())
+  return cache.get(key)!
+}
+
+/** Geometrias compartilhadas dos robôs. `sph`/`cyl` têm diâmetro 1 (use `scale`); cilindro tem o eixo em y. */
+export const geo = {
+  box: unit,
+  sph: new SphereGeometry(0.5, 14, 10),
+  cyl: new CylinderGeometry(0.5, 0.5, 1, 14),
+  arc: new TorusGeometry(0.27, 0.028, 6, 20, Math.PI),
+  rbox: (w: number, h: number, d: number, r: number) => memo(`rb${w},${h},${d},${r}`, () => new RoundedBoxGeometry(w, h, d, 3, r)),
+  caps: (r: number, l: number) => memo(`cp${r},${l}`, () => new CapsuleGeometry(r, l, 4, 10)),
+}
 
 export const m = {
   // estrutura

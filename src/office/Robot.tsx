@@ -1,12 +1,15 @@
 import { useRef, type Ref } from 'react'
 import { useFrame } from '@react-three/fiber'
-import type { Group, Mesh } from 'three'
+import type { BufferGeometry, Group, Mesh } from 'three'
 import type { AgentId, AgentStatus } from '../lib/types'
-import { m, unit, type MatKey } from './materials'
+import { geo, m, type MatKey } from './materials'
 
 type V3 = [number, number, number]
-export function B({ p, s, k, ref }: { p: V3; s: V3; k: MatKey; ref?: Ref<Mesh> }) {
-  return <mesh ref={ref} geometry={unit} material={m[k]} position={p} scale={s} />
+const HALF_PI = Math.PI / 2
+
+/** Peça genérica: `g` define a forma; `s` escala; `rot` rotaciona. */
+export function B({ p, s = [1, 1, 1], k, g = geo.box, rot, ref }: { p: V3; s?: V3; k: MatKey; g?: BufferGeometry; rot?: V3; ref?: Ref<Mesh> }) {
+  return <mesh ref={ref} geometry={g} material={m[k]} position={p} scale={s} rotation={rot} />
 }
 
 /** Roupa de cada função: cor do torso e das mangas. */
@@ -18,38 +21,58 @@ const outfit: Record<AgentId, { torso: MatKey; sleeve: MatKey }> = {
   mercury: { torso: 'suit', sleeve: 'suit' },
 }
 
-/** Detalhes no torso (z = -0.125 é a frente do casaco). */
+const torsoGeo = geo.rbox(0.66, 0.72, 0.44, 0.17)
+const headGeo = geo.rbox(0.5, 0.44, 0.44, 0.17)
+const armGeo = geo.caps(0.075, 0.5)
+
+/** Detalhes no torso (z = -0.125 é a frente). */
 function Torso({ id }: { id: AgentId }) {
   return (
     <>
-      <B p={[0, 0.95, 0.1]} s={[0.66, 0.72, 0.44]} k={outfit[id].torso} />
+      <B g={torsoGeo} p={[0, 0.95, 0.1]} k={outfit[id].torso} />
       {id === 'scout' && (
         <>
-          <B p={[-0.18, 0.88, -0.125]} s={[0.2, 0.18, 0.02]} k="khakiDark" />
-          <B p={[0.18, 0.88, -0.125]} s={[0.2, 0.18, 0.02]} k="khakiDark" />
-          <B p={[-0.08, 1.08, -0.15]} s={[0.1, 0.1, 0.1]} k="joint" />
-          <B p={[0.08, 1.08, -0.15]} s={[0.1, 0.1, 0.1]} k="joint" />
+          <B g={geo.rbox(0.2, 0.18, 0.03, 0.012)} p={[-0.18, 0.88, -0.125]} k="khakiDark" />
+          <B g={geo.rbox(0.2, 0.18, 0.03, 0.012)} p={[0.18, 0.88, -0.125]} k="khakiDark" />
+          <B g={geo.cyl} s={[0.1, 0.12, 0.1]} rot={[HALF_PI, 0, 0]} p={[-0.08, 1.08, -0.16]} k="joint" />
+          <B g={geo.cyl} s={[0.1, 0.12, 0.1]} rot={[HALF_PI, 0, 0]} p={[0.08, 1.08, -0.16]} k="joint" />
         </>
       )}
-      {id === 'atlas' && <B p={[0, 1.34, 0.3]} s={[0.42, 0.2, 0.2]} k="hoodie" />}
+      {id === 'atlas' && <B g={geo.sph} s={[0.46, 0.3, 0.28]} p={[0, 1.33, 0.3]} k="hoodie" />}
       {id === 'sentinel' && (
         <>
-          <B p={[0, 0.62, 0.1]} s={[0.68, 0.3, 0.46]} k="coat" />
-          <B p={[-0.1, 1.1, -0.125]} s={[0.1, 0.4, 0.02]} k="shirt" />
-          <B p={[0.1, 1.1, -0.125]} s={[0.1, 0.4, 0.02]} k="shirt" />
-          <B p={[0.2, 1.05, -0.13]} s={[0.1, 0.07, 0.02]} k="lens" />
+          <B g={geo.rbox(0.68, 0.3, 0.46, 0.1)} p={[0, 0.62, 0.1]} k="coat" />
+          <B g={geo.rbox(0.1, 0.4, 0.03, 0.012)} p={[-0.1, 1.1, -0.125]} k="shirt" />
+          <B g={geo.rbox(0.1, 0.4, 0.03, 0.012)} p={[0.1, 1.1, -0.125]} k="shirt" />
+          <B g={geo.rbox(0.1, 0.07, 0.03, 0.01)} p={[0.2, 1.05, -0.13]} k="lens" />
         </>
       )}
       {id === 'nova' && (
         <>
-          <B p={[0.17, 1.1, -0.125]} s={[0.14, 0.14, 0.02]} k="orange" />
-          <B p={[0, 0.66, -0.125]} s={[0.66, 0.05, 0.02]} k="orange" />
+          <B g={geo.cyl} s={[0.15, 0.02, 0.15]} rot={[HALF_PI, 0, 0]} p={[0.17, 1.1, -0.125]} k="orange" />
+          <B g={geo.rbox(0.66, 0.05, 0.03, 0.012)} p={[0, 0.66, -0.125]} k="orange" />
         </>
       )}
       {id === 'mercury' && (
         <>
-          <B p={[0, 1.05, -0.125]} s={[0.16, 0.45, 0.015]} k="shirt" />
-          <B p={[0, 0.98, -0.135]} s={[0.07, 0.4, 0.015]} k="tie" />
+          <B g={geo.rbox(0.16, 0.45, 0.02, 0.008)} p={[0, 1.05, -0.125]} k="shirt" />
+          <B g={geo.rbox(0.07, 0.4, 0.02, 0.01)} p={[0, 0.98, -0.135]} k="tie" />
+        </>
+      )}
+    </>
+  )
+}
+
+function Headset({ mic }: { mic?: boolean }) {
+  return (
+    <>
+      <B g={geo.arc} p={[0, 0, 0]} k="headset" />
+      <B g={geo.cyl} s={[0.2, 0.07, 0.2]} rot={[0, 0, HALF_PI]} p={[-0.29, 0, 0]} k="headset" />
+      <B g={geo.cyl} s={[0.2, 0.07, 0.2]} rot={[0, 0, HALF_PI]} p={[0.29, 0, 0]} k="headset" />
+      {mic && (
+        <>
+          <B g={geo.cyl} s={[0.04, 0.3, 0.04]} rot={[HALF_PI, 0, 0]} p={[-0.29, -0.12, -0.14]} k="headset" />
+          <B g={geo.sph} s={[0.08, 0.08, 0.08]} p={[-0.29, -0.12, -0.3]} k="orange" />
         </>
       )}
     </>
@@ -62,37 +85,23 @@ function HeadGear({ id }: { id: AgentId }) {
     <>
       {id === 'scout' && (
         <>
-          <B p={[0, 0.25, 0]} s={[0.54, 0.1, 0.46]} k="olive" />
-          <B p={[0, 0.2, -0.3]} s={[0.46, 0.03, 0.2]} k="olive" />
+          <B g={geo.sph} s={[0.56, 0.36, 0.5]} p={[0, 0.2, 0]} k="olive" />
+          <B g={geo.cyl} s={[0.44, 0.03, 0.3]} p={[0, 0.17, -0.3]} k="olive" />
         </>
       )}
-      {id === 'atlas' && (
-        <>
-          <B p={[0, 0.24, 0]} s={[0.56, 0.05, 0.1]} k="headset" />
-          <B p={[-0.29, 0, 0]} s={[0.08, 0.2, 0.2]} k="headset" />
-          <B p={[0.29, 0, 0]} s={[0.08, 0.2, 0.2]} k="headset" />
-        </>
-      )}
+      {id === 'atlas' && <Headset />}
       {id === 'sentinel' && (
         <>
-          <B p={[0, 0.12, 0]} s={[0.54, 0.06, 0.44]} k="headset" />
-          <B p={[-0.11, 0.12, -0.225]} s={[0.14, 0.08, 0.02]} k="lens" />
-          <B p={[0.11, 0.12, -0.225]} s={[0.14, 0.08, 0.02]} k="lens" />
+          <B g={geo.rbox(0.54, 0.07, 0.46, 0.03)} p={[0, 0.12, 0]} k="headset" />
+          <B g={geo.cyl} s={[0.15, 0.03, 0.15]} rot={[HALF_PI, 0, 0]} p={[-0.11, 0.12, -0.235]} k="lens" />
+          <B g={geo.cyl} s={[0.15, 0.03, 0.15]} rot={[HALF_PI, 0, 0]} p={[0.11, 0.12, -0.235]} k="lens" />
         </>
       )}
-      {id === 'nova' && (
-        <>
-          <B p={[0, 0.24, 0]} s={[0.56, 0.05, 0.1]} k="headset" />
-          <B p={[-0.29, 0, 0]} s={[0.08, 0.2, 0.2]} k="headset" />
-          <B p={[0.29, 0, 0]} s={[0.08, 0.2, 0.2]} k="headset" />
-          <B p={[-0.29, -0.12, -0.14]} s={[0.04, 0.04, 0.3]} k="headset" />
-          <B p={[-0.29, -0.12, -0.3]} s={[0.07, 0.07, 0.05]} k="orange" />
-        </>
-      )}
+      {id === 'nova' && <Headset mic />}
       {id === 'mercury' && (
         <>
-          <B p={[0, 0.23, 0.03]} s={[0.5, 0.08, 0.4]} k="hair" />
-          <B p={[0.27, 0, 0]} s={[0.05, 0.1, 0.1]} k="headset" />
+          <B g={geo.sph} s={[0.54, 0.32, 0.48]} p={[0, 0.2, 0.02]} k="hair" />
+          <B g={geo.sph} s={[0.06, 0.1, 0.1]} p={[0.27, 0, 0]} k="headset" />
         </>
       )}
     </>
@@ -127,18 +136,16 @@ export function Robot({ id, status, still }: { id: AgentId; status: AgentStatus;
   return (
     <group position={[0, 0, -0.55]}>
       <Torso id={id} />
-      <group ref={armL} position={[-0.42, 1.2, 0.1]}>
-        <B p={[0, 0, -0.3]} s={[0.14, 0.14, 0.6]} k={sleeve} />
-        <B p={[0, 0, -0.62]} s={[0.12, 0.12, 0.08]} k="robot" />
-      </group>
-      <group ref={armR} position={[0.42, 1.2, 0.1]}>
-        <B p={[0, 0, -0.3]} s={[0.14, 0.14, 0.6]} k={sleeve} />
-        <B p={[0, 0, -0.62]} s={[0.12, 0.12, 0.08]} k="robot" />
-      </group>
+      {[-0.42, 0.42].map((x) => (
+        <group key={x} ref={x < 0 ? armL : armR} position={[x, 1.2, 0.1]}>
+          <B g={armGeo} rot={[HALF_PI, 0, 0]} p={[0, 0, -0.3]} k={sleeve} />
+          <B g={geo.sph} s={[0.15, 0.15, 0.15]} p={[0, 0, -0.62]} k="robot" />
+        </group>
+      ))}
       <group ref={head} position={[0, 1.55, 0.1]}>
-        <B p={[0, 0, 0]} s={[0.5, 0.42, 0.42]} k="robot" />
-        <B ref={eyeL} p={[-0.11, 0.02, -0.215]} s={[0.1, 0.1, 0.02]} k="eye" />
-        <B ref={eyeR} p={[0.11, 0.02, -0.215]} s={[0.1, 0.1, 0.02]} k="eye" />
+        <B g={headGeo} p={[0, 0, 0]} k="robot" />
+        <B ref={eyeL} g={geo.sph} s={[0.1, 0.1, 0.03]} p={[-0.11, 0.02, -0.22]} k="eye" />
+        <B ref={eyeR} g={geo.sph} s={[0.1, 0.1, 0.03]} p={[0.11, 0.02, -0.22]} k="eye" />
         <HeadGear id={id} />
       </group>
     </group>

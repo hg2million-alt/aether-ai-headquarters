@@ -5,6 +5,7 @@
 - Fase 1–2: fundação, tokens, navegação mobile, Painel/Histórico (dados simulados rotulados), logo SVG.
 - Fase 3–4: cena 3D (lazy, pausa fora da tela, reduced-motion, fallback 2D), 5 robôs com estados, modo noturno, seleção por toque.
 - Estilização do escritório (1 andar, sem teto): tijolo, piso de madeira, janelas, arandelas, telão, sofá, plantas, estante, bebedouro; cenário estático **fundido em uma malha por material** (`src/office/staticScene.ts`). Robôs vestidos por função (`src/office/Robot.tsx`).
+- Visual menos "quadrado": cenário com formas curvas (lajes de cantos arredondados, pernas/cadeiras/mesas cilíndricas, vasos cônicos, folhagem em esferas, sofá macio); robôs com cabeça/corpo arredondados, membros em cápsula e acessórios curvos (boné em domo, fones com arco).
 - Fase 5: gamificação determinística. Fase 6: contrato de eventos, HMAC, Worker/D1 (esqueleto testado), camada de dados.
 - Fase 7: `scripts/check-ui.cjs` (7 larguras × 5 rotas: overflow, h1, landmarks, nomes acessíveis, alvos ≥44px → OK); contraste `fg-3` corrigido (AA); skip link; CSP/headers em `public/_headers` testados sem violações; `npm audit` 0 vulnerabilidades; sem segredos/fetch/eval no frontend; Worker rejeita corpo grande antes de ler; 18 testes OK.
 
