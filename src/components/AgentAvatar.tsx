@@ -36,10 +36,11 @@ export function AgentAvatar({ id, status }: { id: AgentId; status: AgentStatus }
           ctx.drawImage(cv, Math.round((W - cv.width) / 2), H - 2 - cv.height)
         }
       } else {
-        const cv = charSprite(id, style, status, tick)
+        // sem sinal: respira e pisca (pose de repouso) mantendo o balão "?"
+        const cv = charSprite(id, style, status === 'unknown' ? 'idle' : status, tick)
         const x = Math.round((W - cv.width) / 2), y = H - 4 - cv.height
         ctx.drawImage(cv, x, y)
-        const hands = status === 'working' || status === 'unknown' ? handsSprite(style, status, tick) : null
+        const hands = status === 'working' ? handsSprite(style, status, tick) : null
         if (hands) ctx.drawImage(hands, Math.round((W - hands.width) / 2), y + 20)
       }
       const bub = bubbleState ? bubbleSprite(bubbleState, tick) : null
