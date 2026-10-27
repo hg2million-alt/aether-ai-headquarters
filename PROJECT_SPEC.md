@@ -21,7 +21,7 @@ React + TypeScript + Vite + Tailwind v4. 3D: Three.js + React Three Fiber (Fase 
 Meta diária/semanal, leads qualificados, sites em desenvolvimento/publicados, demos apresentadas, negociações, vendas, receita registrada, agentes ativos/descansando, próxima rotina, histórico. Metas e resultados separados; dados simulados sempre rotulados como tal.
 
 ## Escritório 3D (Fases 3–4)
-Diorama isométrico low-poly, piso grafite, iluminação branca suave. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
+Prédio isométrico em corte (3 andares, 2 escritórios por andar): um escritório por agente — SCOUT/ATLAS térreo, SENTINEL/NOVA 2º andar, MERCURY 3º; sala de reunião decorativa sem agente. Low-poly, piso grafite, iluminação branca suave. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
 Estados: idle, sleeping, working, completed, failed, unknown. Todos inativos → modo noturno. Sem confirmação confiável → `unknown`; nunca inventar tarefas.
 Otimização: materiais compartilhados, poucas luzes, pixel ratio limitado, lazy load, pausa de render, fallback 2D.
 
