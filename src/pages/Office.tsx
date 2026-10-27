@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AgentAvatar } from '../components/AgentAvatar'
 import { Badge, Card, ConnectionBanner, PageHeader } from '../components/ui'
 import { useSnapshot } from '../data/source'
 import { formatDateTime } from '../lib/format'
@@ -92,12 +93,17 @@ export function Office() {
 
       {agent ? (
         <Card className="mx-5 mt-3">
+          <div className="flex items-start gap-4">
+            <AgentAvatar id={agent.id} status={agent.status} />
+            <div className="flex-1">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-light uppercase tracking-[0.2em] text-white">{agent.name}</p>
               <p className="mt-1 text-xs text-fg-2">{agent.role}</p>
             </div>
             <Badge>{STATUS_PT[agent.status]}</Badge>
+          </div>
+            </div>
           </div>
           <p className="mt-4 text-[11px] uppercase tracking-[0.12em] text-fg-3">Agora</p>
           <p className="mt-1 text-sm text-fg">{agent.status === 'unknown' ? 'Sem sinal da automação' : (labels[agent.id] ?? '—')}</p>
