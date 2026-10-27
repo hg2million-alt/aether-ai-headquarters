@@ -30,12 +30,13 @@ export default function App() {
 
   return (
     <div className="flex min-h-full flex-col md:flex-row">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:text-black">Pular para o conteúdo</a>
       <BottomNav active={route} />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex justify-center border-b border-line px-5 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
           <Wordmark />
         </div>
-        <main className="mx-auto w-full max-w-3xl flex-1 pb-28 md:pb-10">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-3xl flex-1 pb-28 md:pb-10">
           <View />
         </main>
       </div>

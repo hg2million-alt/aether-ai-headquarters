@@ -6,7 +6,7 @@ export const colors = {
   line: '#353537',
   fg: '#F5F5F5',
   fg2: '#929296',
-  fg3: '#66666A',
+  fg3: '#818185', // ajustado de #66666A para contraste AA
   white: '#FFFFFF',
   black: '#000000',
 } as const

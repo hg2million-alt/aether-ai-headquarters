@@ -19,6 +19,7 @@ const json = (data: unknown, status = 200) =>
 
 async function ingest(req: Request, env: Env): Promise<Response> {
   if (!env.EVENT_SIGNING_SECRET) return json({ error: 'server_misconfigured' }, 500) // falha fechada
+  if (Number(req.headers.get('content-length') ?? 0) > MAX_BODY) return json({ error: 'payload_too_large' }, 413)
   const body = await req.text()
   if (body.length > MAX_BODY) return json({ error: 'payload_too_large' }, 413)
 

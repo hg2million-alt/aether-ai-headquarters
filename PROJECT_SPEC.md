@@ -11,6 +11,9 @@ Monocromática, minimalista, premium, arquitetônica. Sem pixel art, sem cores d
 Paleta: bg #0B0B0B · bg2 #171719 · elevada #202022 · borda #353537 · texto #F5F5F5 · texto 2 #929296 · texto 3 #66666A · #FFF · #000.
 Tokens: `src/index.css` (`@theme`) e `src/lib/tokens.ts`.
 
+**Exceção (decisão do dono):** a cena 3D do escritório segue a referência quente (tijolo, madeira, luz âmbar, plantas) e os robôs vestem roupas por função (SCOUT colete/boné explorador, ATLAS moletom/fone, SENTINEL jaleco/óculos de proteção, NOVA macacão/headset de piloto, MERCURY terno/gravata). A UI fora da cena permanece monocromática.
+Ajuste de acessibilidade: texto discreto `fg-3` = #818185 (era #66666A, contraste 3,1:1 < AA).
+
 ## Mobile-first
 Larguras 360/375/390/412/430. Navegação inferior, alvos ≥48px, uso com uma mão, sem scroll horizontal, safe areas, movimento reduzido respeitado. Tablet/desktop secundário (nav lateral).
 
@@ -21,7 +24,7 @@ React + TypeScript + Vite + Tailwind v4. 3D: Three.js + React Three Fiber (Fase 
 Meta diária/semanal, leads qualificados, sites em desenvolvimento/publicados, demos apresentadas, negociações, vendas, receita registrada, agentes ativos/descansando, próxima rotina, histórico. Metas e resultados separados; dados simulados sempre rotulados como tal.
 
 ## Escritório 3D (Fases 3–4)
-Prédio isométrico em corte (térreo + 3 andares): recepção no térreo, 3 andares de escritórios — SCOUT/ATLAS 1º, SENTINEL/NOVA 2º, MERCURY 3º, teto com platibanda; sala de reunião decorativa sem agente. Low-poly, piso grafite, iluminação branca suave. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
+Escritório aberto de UM andar, em corte, sem teto (diorama): recepção no térreo, 3 andares de escritórios — SCOUT/ATLAS 1º, SENTINEL/NOVA 2º, MERCURY 3º, teto com platibanda; sala de reunião decorativa sem agente. Low-poly, piso grafite, iluminação branca suave. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
 Estados: idle, sleeping, working, completed, failed, unknown. Todos inativos → modo noturno. Sem confirmação confiável → `unknown`; nunca inventar tarefas.
 Otimização: materiais compartilhados, poucas luzes, pixel ratio limitado, lazy load, pausa de render, fallback 2D.
 

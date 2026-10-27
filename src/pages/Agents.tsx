@@ -83,7 +83,7 @@ export function Agents() {
       <ul className="grid grid-cols-2 gap-3 px-5">
         {g.achievements.map((a) => (
           <li key={a.id}>
-            <Card className={`h-full ${a.unlockedAt ? '' : 'opacity-60'}`}>
+            <Card className={`h-full ${a.unlockedAt ? '' : 'border-dashed'}`}>
               <Badge>{a.unlockedAt ? 'Desbloqueada' : 'Bloqueada'}</Badge>
               <p className="mt-3 text-sm text-white">{a.title}</p>
               <p className="mt-1 text-xs text-fg-3">{a.description}</p>

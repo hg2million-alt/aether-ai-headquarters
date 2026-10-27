@@ -1,21 +1,21 @@
 # PROGRESS
-**Etapa atual:** Fase 6 concluída. Próxima: Fase 7 (testes e publicação).
+**Etapa atual:** Fase 7 concluída (sem publicar). Projeto pronto para aprovação de publicação.
 
 ## Concluído
-- Fase 1–2: fundação, tokens, navegação, Painel/Histórico (dados simulados rotulados), logo SVG.
-- Fase 3–4: cena 3D otimizada (lazy, materiais compartilhados, pausa fora da tela, reduced-motion, fallback 2D), 5 robôs com estados, modo noturno, seleção por toque. **Cena atual: escritório aberto de UM andar, sem teto (diorama), estilo definido pelo usuário** (layout em `src/lib/office.ts`).
-- Fase 5: gamificação determinística (`src/lib/gamification.ts`): XP só de eventos verificados e concluídos, dedupe, níveis, conquistas.
-- Fase 6: `src/shared/events.ts` (contrato, validação estrita, dedupe, estado `unknown`), `src/shared/auth.ts` (HMAC + anti-replay), `worker/` (Worker + schema D1 + wrangler.toml sem segredos), `src/data/source.ts` (camada de dados; hoje mock), `INTEGRATION.md` (plano de autenticação).
-- 18 testes (`npm test`): gamificação, contrato, HMAC, Worker com D1 falso (401/400/dedupe/falha fechada).
+- Fase 1–2: fundação, tokens, navegação mobile, Painel/Histórico (dados simulados rotulados), logo SVG.
+- Fase 3–4: cena 3D (lazy, pausa fora da tela, reduced-motion, fallback 2D), 5 robôs com estados, modo noturno, seleção por toque.
+- Estilização do escritório (1 andar, sem teto): tijolo, piso de madeira, janelas, arandelas, telão, sofá, plantas, estante, bebedouro; cenário estático **fundido em uma malha por material** (`src/office/staticScene.ts`). Robôs vestidos por função (`src/office/Robot.tsx`).
+- Fase 5: gamificação determinística. Fase 6: contrato de eventos, HMAC, Worker/D1 (esqueleto testado), camada de dados.
+- Fase 7: `scripts/check-ui.cjs` (7 larguras × 5 rotas: overflow, h1, landmarks, nomes acessíveis, alvos ≥44px → OK); contraste `fg-3` corrigido (AA); skip link; CSP/headers em `public/_headers` testados sem violações; `npm audit` 0 vulnerabilidades; sem segredos/fetch/eval no frontend; Worker rejeita corpo grande antes de ler; 18 testes OK.
 
 ## Pendências
-- Nada foi publicado: Worker/D1/Access não criados (precisam de aprovação).
-- Leitura pelo navegador exige Cloudflare Access + validação de JWT (não implementado).
-- Desempenho 3D em Android real não medido; robôs de costas para a câmera.
-- Ajustes ainda placeholder; sem rate limiting no Worker.
+- FPS em Android real NÃO medido (software render: ~48 FPS em 390px, só indicativo).
+- Worker/D1/Access não criados; leitura pelo navegador exige Cloudflare Access + JWT; sem rate limiting.
+- Ajustes ainda placeholder; robôs de costas para a câmera.
+- Teste em leitor de tela real não feito (só verificações automáticas).
 
 ## Próxima tarefa
-Fase 7: testes de responsividade/acessibilidade/desempenho, revisão de segurança, preparar Cloudflare Pages (sem publicar sem aprovação).
+Aprovação do dono para publicar no Pages; depois criar Worker/D1/Access (INTEGRATION.md). Em seguida: adaptar a automação original para emitir eventos assinados.
 
 ## Problemas conhecidos
-Chunk do 3D > 500KB (lazy; aceitável).
+Chunk do 3D ~246KB gzip (lazy; aceitável).

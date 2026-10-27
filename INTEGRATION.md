@@ -16,3 +16,8 @@
 
 ## Passos manuais futuros (exigem sua aprovação)
 `wrangler d1 create aether-hq` → colocar o `database_id` em `worker/wrangler.toml` → `wrangler d1 execute aether-hq --file=worker/schema.sql` → `wrangler secret put …` → `wrangler deploy` → configurar Access → ligar o frontend.
+
+## Publicação no Cloudflare Pages (preparada, NÃO executada)
+- Build: `npm run build` · saída: `dist` · Node 22 (`.node-version`). Rotas por hash: sem regras de redirect.
+- `public/_headers` já traz CSP estrita, nosniff, Referrer-Policy, Permissions-Policy, COOP e frame-ancestors (testado com servidor local sem violações; ao ligar a API, adicionar a origem do Worker em `connect-src`).
+- Antes de publicar: aprovação do dono, Cloudflare Access no site, Worker/D1 criados conforme os passos acima.
