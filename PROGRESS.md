@@ -1,19 +1,23 @@
 # PROGRESS
-**Etapa atual:** escritório em pixel art isométrica 2D com os **5 agentes** (piloto aprovado pelo dono) + área de descanso. Próximo: refinar a arte e conectar aos dados reais (Fase 6/7).
+**Etapa atual:** escritório em pixel art isométrica 2D ampliado para **600 tiles (30×20, 20× o anterior)** com 4 salas e agentes que circulam. Próximo: refinar arte e conectar a dados reais.
 
 ## Concluído
-- Fases 1–2, 5, 6, 7: dashboard, gamificação determinística, contrato de eventos/HMAC/Worker/D1 (testados), segurança e acessibilidade — inalterados.
-- 3D removido: `src/office/` apagado (continua no histórico git); desinstalados `three`, `@react-three/fiber`, `@types/three`. Dependências de runtime: só `react`, `react-dom`.
-- `src/office2d/`: `raster.ts` (rasterizador pixel a pixel: caixas isométricas 2:1, elipses, dithering), `room.ts` (piso de tábuas, parede de tijolo, janela com cidade, painel digital, arandelas, plantas), `furniture.ts` (mesa com gavetas, teclado, monitores, caneca, luminária, cadeira), `characters.ts` (sprites 20×30 em grade de pixels com contorno automático, paleta por `CharStyle`, 6 estados + balões), `scene.ts` (composição por profundidade, modo noturno, seleção), `PixelOffice.tsx` (canvas, 4 passos/s, pausa fora da tela/aba, reduced-motion = quadro estático, toque seleciona).
-- Estados: working (digita, balão `</>`), idle (respira/pisca), sleeping (`Zz`), completed (braços para cima, `✓`), failed (cenho, suor, `!`), unknown (`?`). Noite quando todos idle/sleeping.
-- Expansão: SCOUT, ATLAS, SENTINEL, NOVA, MERCURY com estilos próprios (`STATIONS` em `scene.ts`: cabelo ponytail/short/curly/swept, roupas colete/moletom/jaleco/macacão com headset/blazer com gravata); mesas de 1,6 tile; sofá, mesa de centro e plantas em `buildProps()`. Segundo monitor removido (cobria rostos).
-- Arte: 100% autoral (sem pacotes de terceiros — OpenGameArt/Kenney/itch bloqueados no ambiente), sem questão de licença.
+- Fases 1–2, 5, 6, 7: dashboard, gamificação determinística, contrato de eventos/HMAC/Worker/D1 (testados), segurança e acessibilidade.
+- Escritório 2D (`src/office2d/`): sem 3D (Three.js removido). Dependências de runtime: `react`, `react-dom`.
+- **Mundo 30×20** (`world.ts`): Trabalho (14×10, madeira), Refeitório (16×10, azulejo xadrez), Descanso (10×10, carpete) e Games (20×10, borracha). Divisórias baixas com portas (`PARTITIONS`/`DOORS`), nome de cada sala pintado no piso, paredes de tijolo com janelas.
+- **Móveis** (`layout.ts` → `furniture.ts`): 5 mesas com monitor, mesa de reunião, estantes, balcão de café com 2 máquinas, geladeira, 3 mesas de refeição, 5 camas, 2 sofás, mesa de centro, 3 fliperamas, 2 pebolins, pufes, plantas.
+- **Comportamento determinístico** (`behavior.ts`, `path.ts` A*, sem IA/Math.random): working/completed/failed/unknown → mesa; sleeping → cama própria; **idle → circula entre salas com atividades variadas** (ler no sofá, café, comer, fliperama, pebolim; 10–20 s cada; vagas sem conflito).
+- **Personagens** (`characters.ts`, `styles.ts`): sentados (6 estados + ler + comer), em pé de frente/costas com caminhada de 4 quadros, café, fliperama, pebolim, cabeça no travesseiro (cama). Arte autoral em grades de pixels.
+- **Câmera** (`PixelOffice.tsx`): arrastar, zoom 1×/2×/3×, atalhos por sala, seguir agente; 8 quadros/s; pausa fora da tela/aba; reduced-motion = estado final sem animação.
+- Noite: só quando todos dormem.
+- Testes: 25 (`npm test`), incluindo alcançabilidade de todas as vagas, caminho por portas, vagas distintas, variedade de lazer, retorno à mesa, determinismo.
+- Medido (desktop headless): ~1,3 % CPU e ~6 MB heap em animação; carga ~0,4 s.
 
 ## Pendências
-- Layout das 5 estações ainda denso (fileiras se sobrepõem no iso); considerar sala maior/câmera com pan, estante, máquina de café.
-- Rostos ainda simples; um pixel artist poderia refinar sprites (mais quadros de animação, mais variedade de cabelo/roupa).
-- Desempenho em Android real não medido (só desktop headless).
+- Desempenho em Android real não medido.
+- Arte simples (rostos, pebolim, fliperama ainda podem ser refinados por pixel artist); mais quadros de animação.
+- Sem minimapa; pessoas podem cruzar-se sem desvio entre si.
 - Worker/D1/Access ainda não criados; Ajustes placeholder.
 
 ## Próxima tarefa
-Refinar a arte com o dono (layout, mais quadros de animação, mais móveis); depois publicar (com aprovação) e ligar a API (INTEGRATION.md).
+Revisão visual com o dono; depois publicar (com aprovação) e ligar a API (INTEGRATION.md).

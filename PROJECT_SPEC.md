@@ -23,11 +23,11 @@ React + TypeScript + Vite + Tailwind v4. Escritório: Canvas 2D (pixel art, spri
 ## Dashboard (Fase 2)
 Meta diária/semanal, leads qualificados, sites em desenvolvimento/publicados, demos apresentadas, negociações, vendas, receita registrada, agentes ativos/descansando, próxima rotina, histórico. Metas e resultados separados; dados simulados sempre rotulados como tal.
 
-## Escritório em pixel art (Fases 3–4, reformulado)
-Cena isométrica 2D (tile 32×16) desenhada pixel a pixel em Canvas 2D: piso de madeira, paredes de tijolo, janelas grandes com esquadria escura, mesas com computador e gavetas, cadeiras, plantas, painel digital, arandelas; depois: sofá e mesa de centro. Sem emojis, ícones ou divs como sprites. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
-Estados: idle, sleeping, working, completed, failed, unknown. Todos inativos → modo noturno. Sem confirmação confiável → `unknown`; nunca inventar tarefas.
-Otimização: sprites e camadas pré-renderizados (cache), 4 passos de animação/s, pausa fora da tela ou aba oculta, `prefers-reduced-motion` = quadro estático, escala inteira (fracionária só em telas densas).
-**Estado:** 5 estações (SCOUT, ATLAS, SENTINEL, NOVA, MERCURY), sofá, mesa de centro e plantas.
+## Escritório em pixel art (reformulado)
+Mundo isométrico 2D (tile 32×16) de 30×20 tiles = 600 tiles, em Canvas 2D, desenhado pixel a pixel (sem emojis, ícones ou divs como sprites; sem 3D). Quatro salas com divisórias e portas: **Trabalho** (mesas dos 5 agentes, reunião, estantes), **Refeitório** (balcão de café, mesas), **Descanso** (5 camas, sofás, estante), **Games** (fliperamas, pebolins, pufes).
+Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
+Estados: idle, sleeping, working, completed, failed, unknown. Trabalhando/concluído/erro/desconhecido → na mesa; dormindo → na própria cama; **ocioso → circula entre as salas com atividades variadas** (sofá, café, refeitório, fliperama, pebolim), de forma determinística. Modo noturno quando todos dormem. Sem confirmação confiável → `unknown`; nunca inventar tarefas.
+Câmera: arrastar, zoom 1×/2×/3×, atalhos por sala e seguir agente. Otimização: sprites e camadas pré-renderizados, 8 quadros/s, pausa fora da tela/aba, `prefers-reduced-motion` = sem animação.
 
 ## Gamificação (Fase 5)
 XP, níveis, conquistas, histórico, estatísticas por agente. XP só por eventos verificados, sem duplicidade, lógica 100% determinística (sem IA).

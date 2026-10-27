@@ -14,25 +14,24 @@ export function rgb(hex: string): RGB {
 export const shade = (c: RGB, k: number): RGB => [Math.min(255, Math.round(c[0] * k)), Math.min(255, Math.round(c[1] * k)), Math.min(255, Math.round(c[2] * k))]
 export const mix = (a: RGB, b: RGB, t: number): RGB => [Math.round(a[0] + (b[0] - a[0]) * t), Math.round(a[1] + (b[1] - a[1]) * t), Math.round(a[2] + (b[2] - a[2]) * t)]
 
-/** Hash determinístico (para variação de tijolos, tábuas etc.). */
-export function hash(a: number, b = 0, c = 0): number {
-  let h = (Math.imul(a + 1, 374761393) ^ Math.imul(b + 7, 668265263) ^ Math.imul(c + 13, 2147483647)) >>> 0
-  h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296
-}
+import { hash } from './rand'
+export { hash }
 
 /** Camada de pixels RGBA. */
 export class Pix {
   readonly data: Uint8ClampedArray
-  constructor(readonly w: number, readonly h: number) {
+  /** `offX/offY`: posição do canto superior esquerdo no mundo (as coordenadas de desenho são do mundo). */
+  constructor(readonly w: number, readonly h: number, readonly offX = 0, readonly offY = 0) {
     this.data = new Uint8ClampedArray(w * h * 4)
   }
   set(x: number, y: number, c: RGB, a = 255) {
+    x -= this.offX; y -= this.offY
     if (x < 0 || y < 0 || x >= this.w || y >= this.h) return
     const i = (y * this.w + x) * 4
     this.data[i] = c[0]; this.data[i + 1] = c[1]; this.data[i + 2] = c[2]; this.data[i + 3] = a
   }
   get(x: number, y: number): RGB | null {
+    x -= this.offX; y -= this.offY
     if (x < 0 || y < 0 || x >= this.w || y >= this.h) return null
     const i = (y * this.w + x) * 4
     return this.data[i + 3] === 0 ? null : [this.data[i], this.data[i + 1], this.data[i + 2]]
@@ -114,15 +113,8 @@ export class Pix {
   }
 }
 
-/** Projeção isométrica 2:1 (tile 32×16). */
-export const TILE_W = 32
-export const TILE_H = 16
-export interface Origin { ox: number; oy: number }
-
-export const proj = (o: Origin, gx: number, gy: number, z = 0): [number, number] => [
-  o.ox + Math.round((gx - gy) * (TILE_W / 2)),
-  o.oy + Math.round((gx + gy) * (TILE_H / 2)) - z,
-]
+import { proj, TILE_W, TILE_H, type Origin } from './iso'
+export { proj, TILE_W, TILE_H, type Origin }
 
 export interface BoxStyle {
   top: RGB | ((gx: number, gy: number) => RGB)
@@ -162,3 +154,6 @@ export function isoBox(p: Pix, o: Origin, b: { gx: number; gy: number; w: number
   p.line(C[0], C[1], B[0], B[1], s.hi ?? s.outline)
   p.line(C[0], C[1], Cb[0], Cb[1], s.outline)
 }
+
+/** Gancho para a função de planta (evita dependência circular room ↔ furniture). */
+export const paintPlantRef: { fn: (p: Pix, x: number, y: number, big: boolean) => void } = { fn: () => {} }
