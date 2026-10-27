@@ -7,8 +7,7 @@ import type { AgentId, AgentStatus } from '../lib/types'
 import { PixelOffice } from '../office2d/PixelOffice'
 import { SCENE_W } from '../office2d/room'
 
-/** Cena piloto: apenas duas estações. As demais entram após validar a qualidade da arte. */
-const PILOT: AgentId[] = ['scout', 'atlas']
+const AGENTS: AgentId[] = ['scout', 'atlas', 'sentinel', 'nova', 'mercury']
 const states: AgentStatus[] = ['working', 'idle', 'sleeping', 'completed', 'failed', 'unknown']
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -19,7 +18,7 @@ export function Office() {
   const [visible, setVisible] = useState(true)
   const [tabOn, setTabOn] = useState(!document.hidden)
   const [reduced] = useState(reducedMotion)
-  const pilot = useMemo(() => snap.agents.filter((a) => PILOT.includes(a.id)), [snap])
+  const pilot = useMemo(() => snap.agents.filter((a) => AGENTS.includes(a.id)), [snap])
   const initial = useMemo(() => Object.fromEntries(pilot.map((a) => [a.id, a.status])) as Partial<Record<AgentId, AgentStatus>>, [pilot])
   const [statuses, setStatuses] = useState(initial)
   const [selected, setSelected] = useState<AgentId>('atlas')
@@ -50,25 +49,24 @@ export function Office() {
   const agent = pilot.find((a) => a.id === selected)!
   const last = snap.activity.filter((e) => e.agentId === selected).sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0]
   const status = statuses[selected] ?? 'unknown'
-  const all = (s: AgentStatus) => setStatuses(Object.fromEntries(PILOT.map((id) => [id, s])) as Partial<Record<AgentId, AgentStatus>>)
+  const all = (s: AgentStatus) => setStatuses(Object.fromEntries(AGENTS.map((id) => [id, s])) as Partial<Record<AgentId, AgentStatus>>)
 
   return (
     <>
-      <PageHeader title="Escritório" subtitle="Cena piloto em pixel art isométrica." />
+      <PageHeader title="Escritório" subtitle="Escritório da Æther em pixel art isométrica." />
       <SimBanner />
       <div ref={box} className="flex justify-center overflow-hidden border-y border-line bg-bg-2">
         <PixelOffice states={statuses} night={night} selected={selected} onSelect={setSelected} active={visible && tabOn} reducedMotion={reduced} scale={scale} />
       </div>
       {night && <p className="mx-5 mt-3 text-center text-[11px] uppercase tracking-[0.12em] text-fg-2">Modo noturno · todos descansando</p>}
-      <p className="mx-5 mt-3 text-center text-xs text-fg-3">Piloto: 2 de 5 agentes. Os demais entram após validar a arte.</p>
 
-      <div className="mx-5 mt-4 grid grid-cols-2 gap-2" role="group" aria-label="Selecionar agente">
+      <div className="mx-5 mt-4 grid grid-cols-5 gap-1.5" role="group" aria-label="Selecionar agente">
         {pilot.map((a) => (
           <button
             key={a.id}
             onClick={() => setSelected(a.id)}
             aria-pressed={selected === a.id}
-            className={`min-h-12 rounded-xl border text-[10px] uppercase tracking-[0.08em] ${selected === a.id ? 'border-white bg-elevated text-white' : 'border-line text-fg-2'}`}
+            className={`min-h-12 rounded-xl border text-[9px] uppercase tracking-[0.04em] ${selected === a.id ? 'border-white bg-elevated text-white' : 'border-line text-fg-2'}`}
           >
             {a.name}
           </button>

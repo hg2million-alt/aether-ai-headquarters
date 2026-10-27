@@ -10,9 +10,10 @@ export interface CharStyle {
   hair: [string, string]
   shirt: [string, string, string] // base, sombra, luz
   accent: string
-  hairStyle: 'short' | 'ponytail'
-  outfit: 'hoodie' | 'vest'
+  hairStyle: 'short' | 'ponytail' | 'curly' | 'swept'
+  outfit: 'hoodie' | 'vest' | 'coat' | 'jumpsuit' | 'blazer'
   glasses?: boolean
+  headset?: boolean
 }
 
 const OUTLINE = rgb('#2a1c18')
@@ -40,6 +41,26 @@ const HEAD_PONY = [
   '.HHHHSSSSSSHg.',
   '.HSSSSSSSSSSs.',
   '.SSSSSSSSSSSs.',
+]
+const HEAD_CURLY = [
+  '...HHHHHHHH...',
+  '.HHHhHHHhHHHH.',
+  'HHhhHHHHHHHHHg',
+  'HHhHHHHHHHHHHg',
+  'HHHHHHHHHHHHHg',
+  'HHHHSSSSSSHHHg',
+  '.HHSSSSSSSSHHg',
+  '.HSSSSSSSSSSs.',
+]
+const HEAD_SWEPT = [
+  '...hhHHHHHH...',
+  '..hhHHHHHHHH..',
+  '.HHhhHHHHHHHg.',
+  '.HHhHHHHHHHHg.',
+  '.HHHHHHHHHHHg.',
+  '.HHHSSSSSSHHg.',
+  '.HHSSSSSSSSHg.',
+  '.HSSSSSSSSSSs.',
 ]
 const HEAD_FACE = [
   '.SSSSSSSSSSSs.',
@@ -149,6 +170,17 @@ export function charSprite(key: string, style: CharStyle, state: AgentStatus, ti
     if (style.outfit === 'hoodie') {
       for (let j = 0; j < 3; j++) { p.set(TORSO_X + 6, ty + 3 + j, rgb('#e8e8e8')); p.set(TORSO_X + 9, ty + 3 + j, rgb('#e8e8e8')) } // cordões
       p.rect(TORSO_X + 5, ty + 7, 6, 1, cS) // bolso
+    } else if (style.outfit === 'coat') {
+      p.set(TORSO_X + 5, ty + 2, accent); p.set(TORSO_X + 5, ty + 3, accent); p.set(TORSO_X + 10, ty + 2, accent); p.set(TORSO_X + 10, ty + 3, accent)
+      p.rect(TORSO_X + 11, ty + 4, 2, 2, rgb('#5a8fd0')) // crachá
+      p.set(TORSO_X + 3, ty + 5, rgb('#c0392b')); p.set(TORSO_X + 3, ty + 6, rgb('#c0392b')) // caneta no bolso
+    } else if (style.outfit === 'jumpsuit') {
+      for (let j = 1; j < 10; j++) p.set(TORSO_X + 7, ty + j, rgb('#aab4c8')) // zíper
+      p.rect(TORSO_X + 10, ty + 3, 3, 2, accent) // emblema
+      p.set(TORSO_X + 11, ty + 5, accent)
+    } else if (style.outfit === 'blazer') {
+      for (let j = 2; j < 8; j++) { p.set(TORSO_X + 7, ty + j, rgb('#a8332f')); p.set(TORSO_X + 8, ty + j, rgb('#a8332f')) } // gravata
+      p.set(TORSO_X + 4, ty + 4, cS); p.set(TORSO_X + 11, ty + 4, cS)
     } else {
       for (let j = 3; j < 9; j++) { p.set(TORSO_X + 3, ty + j, accent); p.set(TORSO_X + 4, ty + j, accent); p.set(TORSO_X + 11, ty + j, accent); p.set(TORSO_X + 12, ty + j, accent) } // colete
       p.set(TORSO_X + 4, ty + 5, rgb('#7d6a3f')); p.set(TORSO_X + 11, ty + 5, rgb('#7d6a3f'))
@@ -162,9 +194,17 @@ export function charSprite(key: string, style: CharStyle, state: AgentStatus, ti
     }
   }
   torso()
-  blit(p, [...(style.hairStyle === 'short' ? HEAD_SHORT : HEAD_PONY), ...HEAD_FACE], hx, hy, pal)
+  const top = { short: HEAD_SHORT, ponytail: HEAD_PONY, curly: HEAD_CURLY, swept: HEAD_SWEPT }[style.hairStyle]
+  blit(p, [...top, ...HEAD_FACE], hx, hy, pal)
   if (style.hairStyle === 'ponytail') {
     ;[[13, 4], [14, 4], [14, 5], [15, 5], [15, 6], [15, 7], [14, 8], [14, 9]].forEach(([x, y], i) => p.set(hx + x, hy + y + (state === 'working' ? 0 : phase && i > 4 ? 1 : 0), i % 2 ? hairHi : hair))
+  }
+  if (style.headset) {
+    const dark = rgb('#17181a')
+    for (let i = 2; i < 12; i++) p.set(hx + i, hy + 1, dark)
+    for (let j = 2; j < 9; j++) { p.set(hx + 1, hy + j, dark); p.set(hx + 12, hy + j, dark) }
+    for (let j = 8; j < 11; j++) { p.set(hx, hy + j, dark); p.set(hx + 13, hy + j, dark) }
+    p.set(hx + 1, hy + 11, dark); p.set(hx + 2, hy + 12, dark); p.set(hx + 3, hy + 12, dark); p.set(hx + 4, hy + 12, rgb('#d9702f'))
   }
   const kind: Face = blink || asleep ? 'closed' : state === 'completed' ? 'happy' : state === 'failed' ? 'frown' : state === 'working' ? 'down' : 'neutral'
   face(p, hx, hy, kind, style, skin, skinSh, hairDark)

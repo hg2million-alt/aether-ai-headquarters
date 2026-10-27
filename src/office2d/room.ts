@@ -189,10 +189,7 @@ export function buildRoom(): Pix {
   p.glow(ORIGIN.ox + 90, ORIGIN.oy + 45 - 38, 7, C.warm, 0.6)
   p.glow(ORIGIN.ox - 10, ORIGIN.oy + 5 - 38, 7, C.warm, 0.6)
   p.glow(ORIGIN.ox - 70, ORIGIN.oy + 35 - 38, 7, C.warm, 0.6)
-  const a = proj(ORIGIN, 0.3, 2.9), b = proj(ORIGIN, 5.75, 0.45)
-  paintPlant(p, a[0], a[1] + 4, true)
+  const b = proj(ORIGIN, 5.75, 0.45)
   paintPlant(p, b[0], b[1] + 4, true)
-  const c = proj(ORIGIN, 0.5, 4.4)
-  paintPlant(p, c[0], c[1] + 2)
   return p
 }

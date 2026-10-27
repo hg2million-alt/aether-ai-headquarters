@@ -27,7 +27,7 @@ Meta diária/semanal, leads qualificados, sites em desenvolvimento/publicados, d
 Cena isométrica 2D (tile 32×16) desenhada pixel a pixel em Canvas 2D: piso de madeira, paredes de tijolo, janelas grandes com esquadria escura, mesas com computador e gavetas, cadeiras, plantas, painel digital, arandelas; depois: sofá e mesa de centro. Sem emojis, ícones ou divs como sprites. Agentes (funções, não 5 IAs): SCOUT prospecção, ATLAS desenvolvimento, SENTINEL qualidade, NOVA publicação, MERCURY comercial.
 Estados: idle, sleeping, working, completed, failed, unknown. Todos inativos → modo noturno. Sem confirmação confiável → `unknown`; nunca inventar tarefas.
 Otimização: sprites e camadas pré-renderizados (cache), 4 passos de animação/s, pausa fora da tela ou aba oculta, `prefers-reduced-motion` = quadro estático, escala inteira (fracionária só em telas densas).
-**Estado:** piloto com 2 estações (SCOUT, ATLAS); os demais após validação da arte.
+**Estado:** 5 estações (SCOUT, ATLAS, SENTINEL, NOVA, MERCURY), sofá, mesa de centro e plantas.
 
 ## Gamificação (Fase 5)
 XP, níveis, conquistas, histórico, estatísticas por agente. XP só por eventos verificados, sem duplicidade, lógica 100% determinística (sem IA).
