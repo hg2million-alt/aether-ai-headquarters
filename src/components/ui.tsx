@@ -55,7 +55,7 @@ const CONN: Record<Connection, string> = {
 export function ConnectionBanner({ state }: { state: Connection }) {
   if (state === 'online') return null
   return (
-    <a href="#/settings" role="status" className="mx-5 mb-4 block rounded-xl border border-dashed border-line px-4 py-2.5 text-[11px] uppercase tracking-label text-fg-2">
+    <a href="#/settings" role="status" className="mx-5 mb-4 flex min-h-12 items-center rounded-xl border border-dashed border-line px-4 py-2.5 text-[11px] uppercase tracking-label text-fg-2">
       {CONN[state]}
     </a>
   )
